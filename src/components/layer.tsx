@@ -1,6 +1,10 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 
-const Layer = ({ isLight, length }) => {
+type LayerProps = {
+  isLight: boolean;
+  length: number;
+};
+const Layer = ({ isLight, length }: LayerProps) => {
   const canvasRef = useRef(null);
 
   if (isLight) {

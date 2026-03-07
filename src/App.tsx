@@ -1,3 +1,5 @@
+/* tslint:disable:no-unused-variable */
+
 import { useState } from "react";
 import Layer from "./components/layer";
 import Toolbar from "./components/toolbar";
@@ -34,8 +36,8 @@ function App() {
     setEraserSize(size);
   };
 
-  const handleSetMode = (mode: string) => {
-    setIsLight(mode === "light");
+  const handleSetLight = (mode: boolean) => {
+    setIsLight(mode);
   };
 
   const handleSetCircleMask = (show: boolean) => {
@@ -76,7 +78,7 @@ function App() {
         onRedo={handleRedo}
         onSetBrushSize={handleSetBrushSize}
         onSetEraserSize={handleSetEraserSize}
-        onSetMode={handleSetMode}
+        onSetLight={handleSetLight}
         onSetCircleMask={handleSetCircleMask}
         onClearLight={handleClearLight}
         onClearDark={handleClearDark}
