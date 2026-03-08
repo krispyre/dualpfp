@@ -26,7 +26,7 @@ const Layer = ({
   const [lastX, setLastX] = useState(0);
   const [lastY, setLastY] = useState(0);
 
-  console.log("im lightmode", isLight);
+  //console.log("im lightmode", isLight);
 
   function draw(e: React.MouseEvent<HTMLCanvasElement>) {
     if (!isDrawing || !ctxRef.current) return;
@@ -48,7 +48,6 @@ const Layer = ({
 
   const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(false);
-    console.warn(e);
     // console.log("canvas: mouseup");
   };
 
@@ -67,7 +66,7 @@ const Layer = ({
 
   //toggle pen/eraser
   useEffect(() => {
-    if (!isDrawing || !ctxRef.current) return;
+    if (!canvasRef || !ctxRef.current) return;
     const ctx: CanvasRenderingContext2D = ctxRef.current;
     if (isErase) {
       ctx.strokeStyle = "rgba(0,0,0,1)";
@@ -76,12 +75,12 @@ const Layer = ({
       ctx.strokeStyle = BRUSH_COL;
       ctx.globalCompositeOperation = "source-over";
     }
-    console.log("change erase to", isErase);
+    console.warn("change erase to", isErase);
   }, [isErase]);
 
   //change pen size
   useEffect(() => {
-    if (!isDrawing || !ctxRef.current) return;
+    if (!canvasRef.current || !ctxRef.current) return;
     const ctx: CanvasRenderingContext2D = ctxRef.current;
     //eraser size is updated in brushSize
     ctx.lineWidth = brushSize;

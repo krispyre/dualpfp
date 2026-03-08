@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Layer from "./components/layer";
 import Toolbar from "./components/toolbar";
 import "./App.css";
@@ -16,8 +16,11 @@ function App() {
   const [isLight, setIsLight] = useState(false);
   const [showCircleMask, setShowCircleMask] = useState(false);
 
-  const handleSetEraser = () => {
-    setIsEraser(!isEraser);
+  const layerLight = useRef(null);
+  const layerDark = useRef(null);
+
+  const handleSetEraser = (e) => {
+    setIsEraser(e);
   };
 
   const handleUndo = () => {
@@ -63,8 +66,22 @@ function App() {
           id="background"
           style={{ width: `${LENGTH}px`, height: `${LENGTH}px` }}
         ></div>
-        <Layer isLight={false} length={LENGTH} />
-        <Layer isLight={true} length={LENGTH} />
+        <Layer
+          canvasRef={layerDark}
+          isLight={false}
+          length={LENGTH}
+          isEnabled={true}
+          brushSize={isEraser ? eraserSize : brushSize}
+          isErase={isEraser}
+        />
+        <Layer
+          canvasRef={layerLight}
+          isLight={true}
+          length={LENGTH}
+          isEnabled={false}
+          brushSize={isEraser ? eraserSize : brushSize}
+          isErase={isEraser}
+        />
         <canvas id="ui" className="layer" width="" height=""></canvas>
       </section>
       <Toolbar
