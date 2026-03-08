@@ -21,17 +21,18 @@ const Layer = ({
 }: LayerProps) => {
   const BRUSH_COL = isLight ? COL_DARK : COL_LIGHT;
   const ctxRef = useRef(null);
-  const [isSelected, setIsSelected] = useState(isEnabled);
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastX, setLastX] = useState(0);
   const [lastY, setLastY] = useState(0);
 
+  const [z, setZ] = useState(isEnabled ? 1 : 0);
+
   //console.log("im lightmode", isLight);
 
   function draw(e: React.MouseEvent<HTMLCanvasElement>) {
-    if (!isDrawing || !ctxRef.current) return;
+    if (!isDrawing || !ctxRef.current || !isEnabled) return;
 
-    console.log("draw", lastX, lastY, e);
+    // console.log("draw", lastX, lastY, e);
 
     const ctx: CanvasRenderingContext2D = ctxRef.current;
     ctx.beginPath();
@@ -87,6 +88,8 @@ const Layer = ({
     console.log("change brush size to", brushSize);
   }, [brushSize]);
 
+  //change z index who's on top to be drawn
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !isEnabled) return;
@@ -108,6 +111,10 @@ const Layer = ({
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
+      style={{
+        zIndex: isEnabled ? 2 : 1,
+      }}
+      id={isLight ? "li" : "da"}
     >
       ur js is disabled
     </canvas>

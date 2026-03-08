@@ -6,10 +6,10 @@ import Toolbar from "./components/toolbar";
 import "./App.css";
 
 const LENGTH = 512;
+const COL_DARK = "#313338";
+const COL_LIGHT = "#FFFFFF";
 
 function App() {
-  const [imgDark, setImgDark] = useState(null);
-  const [imgLight, setImgLight] = useState(null);
   const [isEraser, setIsEraser] = useState(false);
   const [brushSize, setBrushSize] = useState(3);
   const [eraserSize, setEraserSize] = useState(10);
@@ -61,16 +61,21 @@ function App() {
 
   return (
     <>
-      <section className="canvas_container">
+      <section id="canvasContainer">
         <div
           id="background"
-          style={{ width: `${LENGTH}px`, height: `${LENGTH}px` }}
+          style={{
+            width: `${LENGTH}px`,
+            height: `${LENGTH}px`,
+            zIndex: -1,
+            backgroundColor: isLight ? COL_LIGHT : COL_DARK,
+          }}
         ></div>
         <Layer
           canvasRef={layerDark}
           isLight={false}
           length={LENGTH}
-          isEnabled={true}
+          isEnabled={!isLight}
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
         />
@@ -78,11 +83,11 @@ function App() {
           canvasRef={layerLight}
           isLight={true}
           length={LENGTH}
-          isEnabled={false}
+          isEnabled={isLight}
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
         />
-        <canvas id="ui" className="layer" width="" height=""></canvas>
+        {/* <canvas id="ui" className="layer" width="" height=""></canvas> */}
       </section>
       <Toolbar
         isEraser={isEraser}
