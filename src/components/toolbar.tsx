@@ -14,6 +14,7 @@ type ToolbarProps = {
   onClearLight: () => void;
   onClearDark: () => void;
   onSaveImg: (name: string) => void;
+  onShowSecret: (hue: number, isShow: boolean) => void;
 };
 
 const Toolbar = ({
@@ -32,6 +33,7 @@ const Toolbar = ({
   onClearLight,
   onClearDark,
   onSaveImg,
+  onShowSecret,
 }: ToolbarProps) => {
   const handleSetEraser = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSetEraser(e.target.checked);
@@ -154,6 +156,20 @@ const Toolbar = ({
           onClick={handleClearDark}
         >
           clear dark mode
+        </button>
+        <br />
+        <button
+          onMouseLeave={() => onShowSecret(0, false)}
+          onMouseMove={(e) => {
+            const hue = Math.round(
+              (e.nativeEvent.offsetX / (e.target as HTMLElement).clientWidth) *
+                255,
+            );
+            console.log(hue);
+            onShowSecret(hue, true);
+          }}
+        >
+          reveal secret
         </button>
         <hr />
         <div id="saveField">

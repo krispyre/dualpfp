@@ -8,7 +8,7 @@ import "./App.css";
 const LENGTH = 512;
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
-
+const COL_RED = "hsl(353, 60%, 48%)";
 function App() {
   const [isEraser, setIsEraser] = useState(false);
   const [brushSize, setBrushSize] = useState(3);
@@ -18,6 +18,9 @@ function App() {
 
   const layerLight = useRef(null);
   const layerDark = useRef(null);
+
+  const [showSecret, setShowSecret] = useState(false);
+  const [bgCol, setBgCol] = useState(COL_DARK);
 
   const handleSetEraser = (e) => {
     setIsEraser(e);
@@ -59,6 +62,18 @@ function App() {
     console.log("Save image");
   };
 
+  const handleShowSecret = (hue: number, isShow: boolean) => {
+    if (isShow) {
+      setBgCol(`hsl(${hue},10%,20%`);
+    } else {
+      if (isLight) {
+        setBgCol(COL_LIGHT);
+      } else {
+        setBgCol(COL_DARK);
+      }
+    }
+  };
+
   return (
     <>
       <section id="canvasContainer">
@@ -68,7 +83,7 @@ function App() {
             width: `${LENGTH}px`,
             height: `${LENGTH}px`,
             zIndex: -1,
-            backgroundColor: isLight ? COL_LIGHT : COL_DARK,
+            backgroundColor: bgCol,
           }}
         ></div>
         <Layer
@@ -105,6 +120,7 @@ function App() {
         onClearLight={handleClearLight}
         onClearDark={handleClearDark}
         onSaveImg={handleSaveImg}
+        onShowSecret={handleShowSecret}
       />
     </>
   );

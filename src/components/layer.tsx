@@ -41,6 +41,30 @@ const Layer = ({
     ctx.stroke();
   }
 
+  function ditherClear(isLight: boolean) {
+    if (!canvasRef || !ctxRef.current) return;
+    //called on release
+    const evens = isLight ? 0 : 1; //even pixels erased for light mode
+    const ctx: CanvasRenderingContext2D = ctxRef.current;
+    const imgData = ctx.getImageData(0, 0, length, length);
+    const data = imgData.data;
+
+    for (let y = 0; y < length; y++) {
+      for (let x = 0; x < length; x++) {
+        const i = 4 * (x + length * y);
+
+        if ((x + y) % 2 == evens) {
+          /*data[i] = 255;
+          data[i+1] = 255;
+          data[i+2] = 255;*/
+          data[i + 3] = 0;
+        }
+      }
+    }
+    ctx.putImageData(imgData, 0, 0);
+    console.log("dither clear");
+  }
+
   const handleClick = (e) => {
     setIsDrawing(true);
     draw(e);
@@ -49,6 +73,7 @@ const Layer = ({
 
   const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(false);
+    ditherClear(isLight);
     // console.log("canvas: mouseup");
   };
 
@@ -59,10 +84,25 @@ const Layer = ({
 
   const handleMouseMove = (e) => {
     draw(e);
+    // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
 
     setLastX(e.nativeEvent.offsetX);
     setLastY(e.nativeEvent.offsetY);
     // console.log("canvas: mouse move");
+  };
+
+  const handleMouseEnter = (e) => {
+    console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    if (e.buttons == 1) {
+      setIsDrawing(true);
+      setLastX(e.nativeEvent.offsetX);
+      setLastY(e.nativeEvent.offsetY);
+    } else {
+      setIsDrawing(false);
+    }
+  };
+  const handleMouseLeave = (e) => {
+    setIsDrawing(false);
   };
 
   //toggle pen/eraser
@@ -88,7 +128,10 @@ const Layer = ({
     console.log("change brush size to", brushSize);
   }, [brushSize]);
 
-  //change z index who's on top to be drawn
+  //dither clear alternatively
+  // useEffect(() => {
+  //   ditherClear(isLight);
+  // }, [isDrawing]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -111,6 +154,8 @@ const Layer = ({
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       style={{
         zIndex: isEnabled ? 2 : 1,
       }}
