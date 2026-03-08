@@ -92,7 +92,6 @@ const Layer = ({
   };
 
   const handleMouseEnter = (e) => {
-    console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     if (e.buttons == 1) {
       setIsDrawing(true);
       setLastX(e.nativeEvent.offsetX);

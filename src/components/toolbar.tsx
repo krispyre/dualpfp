@@ -48,15 +48,16 @@ const Toolbar = ({
   };
 
   const handleSetBrushSize = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSetBrushSize(Number(e.target.value));
+    onSetBrushSize(Number(e.nativeEvent.target.value));
   };
 
   const handleSetEraserSize = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSetEraserSize(Number(e.target.value));
+    onSetEraserSize(Number(e.nativeEvent.target.value));
   };
 
   const handleSetLight = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSetLight(e.target.checked);
+    // console.warn("hmm", e.target.checked);
   };
 
   const handleSetCircleMask = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,7 +166,7 @@ const Toolbar = ({
               (e.nativeEvent.offsetX / (e.target as HTMLElement).clientWidth) *
                 255,
             );
-            console.log(hue);
+            // console.log(hue);
             onShowSecret(hue, true);
           }}
         >

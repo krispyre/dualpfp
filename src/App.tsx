@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Layer from "./components/layer";
 import Toolbar from "./components/toolbar";
 import "./App.css";
@@ -43,6 +43,7 @@ function App() {
   };
 
   const handleSetLight = (mode: boolean) => {
+    console.warn(mode);
     setIsLight(mode);
   };
 
@@ -63,8 +64,9 @@ function App() {
   };
 
   const handleShowSecret = (hue: number, isShow: boolean) => {
+    console.log(hue, isShow);
     if (isShow) {
-      setBgCol(`hsl(${hue},10%,20%`);
+      setBgCol(`hsl(${hue},10%,40%`);
     } else {
       if (isLight) {
         setBgCol(COL_LIGHT);
@@ -73,6 +75,15 @@ function App() {
       }
     }
   };
+
+  //refactor, should be decoupled to showSecret
+  useEffect(() => {
+    if (isLight) {
+      setBgCol(COL_LIGHT);
+    } else {
+      setBgCol(COL_DARK);
+    }
+  }, [isLight]);
 
   return (
     <>
