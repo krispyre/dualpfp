@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import drawPathSpline from "./spline.js";
+
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
 
@@ -28,18 +30,55 @@ const Layer = ({
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastX, setLastX] = useState(0);
   const [lastY, setLastY] = useState(0);
+  const [curPath, setCurPath] = useState([]);
 
   //console.log("im lightmode", isLight);
 
-  function draw(e: React.MouseEvent<HTMLCanvasElement>) {
+  function drawUnSmoothed(e: React.MouseEvent<HTMLCanvasElement>) {
     if (!isDrawing || !ctxRef.current || !isEnabled) return;
-
-    // console.log("draw", lastX, lastY, e);
 
     const ctx: CanvasRenderingContext2D = ctxRef.current;
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    ctx.stroke();
+  }
+
+  function draw(points, f = 0.3, t = 1) {
+    //i stole this smoothing thing from perplexity idc
+    if (!isDrawing || !ctxRef.current || !isEnabled) return;
+
+    const ctx: CanvasRenderingContext2D = ctxRef.current;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    let preP = points[0],
+      dx1 = 0,
+      dy1 = 0;
+    for (let i = 1; i < points.length; i++) {
+      const curP = points[i];
+      const nexP = points[i + 1] || {
+        x: curP.x + (curP.x - preP.x),
+        y: curP.y,
+      }; // Extrapolate end
+
+      // Safe slope: avoid div-by-zero
+      const dx = nexP.x - preP.x;
+      const safeM = dx !== 0 ? (nexP.y - preP.y) / dx : 0; // Default horizontal if vertical
+
+      const dx2 = (nexP.x - curP.x) * -f;
+      const dy2 = dx2 * safeM * t;
+      ctx.bezierCurveTo(
+        preP.x - dx1,
+        preP.y - dy1,
+        curP.x + dx2,
+        curP.y + dy2,
+        curP.x,
+        curP.y,
+      );
+      dx1 = dx2;
+      dy1 = dy2;
+      preP = curP;
+    }
     ctx.stroke();
   }
 
@@ -70,25 +109,33 @@ const Layer = ({
     ctx.clearRect(0, 0, length, length);
   }
 
-  const handleClick = (e) => {
+  const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(true);
-    draw(e);
+    draw([{ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }]);
     setIsDrawing(false);
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(false);
+    setCurPath([]);
     // console.log("canvas: mouseup");
   };
 
   const handleMouseDown = (e) => {
     setIsDrawing(true);
+    setCurPath([{ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }]);
     // console.log("canvas: mousedown");
   };
 
   const handleMouseMove = (e) => {
-    draw(e);
-    // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    setCurPath((prev) => [
+      ...prev,
+      { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY },
+    ]);
+    if (e.buttons == 1) {
+      draw(curPath);
+      console.log(curPath);
+    }
 
     setLastX(e.nativeEvent.offsetX);
     setLastY(e.nativeEvent.offsetY);
@@ -106,6 +153,7 @@ const Layer = ({
   };
   const handleMouseLeave = (e) => {
     setIsDrawing(false);
+    setCurPath([]);
   };
 
   //toggle pen/eraser
@@ -133,7 +181,9 @@ const Layer = ({
 
   //dither clear
   useEffect(() => {
-    ditherClear(isLight);
+    if (!isDrawing) {
+      ditherClear(isLight);
+    }
   }, [isDrawing]);
 
   //clear layer
