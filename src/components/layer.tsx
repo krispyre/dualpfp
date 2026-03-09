@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import drawPathSpline from "./spline.js";
+import type { Point } from "./drawAction.js";
 
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
@@ -12,7 +12,10 @@ type LayerProps = {
   brushSize: number;
   isErase: boolean;
   shouldClear: boolean;
+  shouldUndo: boolean;
   onClear: (isLight: boolean) => void;
+  onUndo: (isLight: boolean) => void;
+  addDrawHist: (isLight: boolean, newPath: Point[]) => void;
 };
 
 const Layer = ({
@@ -24,6 +27,8 @@ const Layer = ({
   isErase,
   shouldClear,
   onClear,
+  onUndo,
+  addDrawHist,
 }: LayerProps) => {
   const BRUSH_COL = isLight ? COL_DARK : COL_LIGHT;
   const ctxRef = useRef(null);
@@ -110,13 +115,18 @@ const Layer = ({
   }
 
   const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    //toodoo doesnot work
     setIsDrawing(true);
-    draw([{ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }]);
+    setCurPath([{ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }]);
+    drawUnSmoothed(e);
     setIsDrawing(false);
+    addDrawHist(isLight, curPath);
+    setCurPath([]);
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(false);
+    addDrawHist(isLight, curPath);
     setCurPath([]);
     // console.log("canvas: mouseup");
   };
@@ -124,6 +134,7 @@ const Layer = ({
   const handleMouseDown = (e) => {
     setIsDrawing(true);
     setCurPath([{ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }]);
+
     // console.log("canvas: mousedown");
   };
 
@@ -134,7 +145,7 @@ const Layer = ({
     ]);
     if (e.buttons == 1) {
       draw(curPath);
-      console.log(curPath);
+      // console.log(curPath);
     }
 
     setLastX(e.nativeEvent.offsetX);

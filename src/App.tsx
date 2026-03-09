@@ -5,11 +5,13 @@ import Layer from "./components/layer";
 import Toolbar from "./components/toolbar";
 import "./App.css";
 import CircleMask from "./components/circleMask";
+import type { DrawAction, Point } from "./components/drawAction";
 
-const LENGTH = 256;
+const LENGTH = 512;
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
 const COL_RED = "hsl(353, 60%, 48%)";
+
 function App() {
   const [isEraser, setIsEraser] = useState(false);
   const [brushSize, setBrushSize] = useState(3);
@@ -26,7 +28,19 @@ function App() {
   const [showSecret, setShowSecret] = useState(false);
   const [bgCol, setBgCol] = useState(COL_DARK);
 
-  const [filename, setFilename] = useState("dualpfp");
+  const [drawHistory, setDrawHistory] = useState<DrawAction[]>([]);
+  const [drawStep, setDrawStep] = useState(0); //todo for redo
+
+  const addDrawHist = (isLight: boolean, newPath: Point[]) => {
+    setDrawHistory((prev) => {
+      const newHist = [
+        ...prev,
+        { action: "draw", path: newPath, isLight: isLight },
+      ];
+      console.log(newHist);
+      return newHist;
+    });
+  };
 
   const handleSetEraser = (e) => {
     setIsEraser(e);
@@ -51,13 +65,18 @@ function App() {
   const handleSetLight = (mode: boolean) => {
     console.warn(mode);
     if (!showSecret) {
-      if (isLight) {
+      if (mode) {
         setBgCol(COL_LIGHT);
       } else {
         setBgCol(COL_DARK);
       }
     }
     setIsLight(mode);
+    // setDrawHistory((prev) => {
+    //   const newHist = [...prev, { action: "switch", isLight: isLight }];
+    //   console.log(newHist);
+    //   return newHist;
+    // });
   };
 
   const handleSetCircleMask = (show: boolean) => {
@@ -129,6 +148,7 @@ function App() {
           isErase={isEraser}
           shouldClear={shouldClearDark}
           onClear={() => setShouldClearDark(false)}
+          addDrawHist={addDrawHist}
         />
         <Layer
           canvasRef={layerLight}
@@ -139,6 +159,7 @@ function App() {
           isErase={isEraser}
           shouldClear={shouldClearLight}
           onClear={() => setShouldClearLight(false)}
+          addDrawHist={addDrawHist}
         />
         <canvas id="ui" className="layer" width="" height=""></canvas>
         <CircleMask isEnabled={showCircleMask} length={LENGTH} />
