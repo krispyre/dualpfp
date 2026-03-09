@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Layer from "./components/layer";
 import Toolbar from "./components/toolbar";
 import "./App.css";
+import CircleMask from "./components/circleMask";
 
 const LENGTH = 512;
 const COL_DARK = "#313338";
@@ -108,7 +109,8 @@ function App() {
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
         />
-        {/* <canvas id="ui" className="layer" width="" height=""></canvas> */}
+        <canvas id="ui" className="layer" width="" height=""></canvas>
+        <CircleMask isEnabled={showCircleMask} length={LENGTH} />
       </section>
       <Toolbar
         isEraser={isEraser}
