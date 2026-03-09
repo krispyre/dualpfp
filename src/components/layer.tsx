@@ -54,9 +54,6 @@ const Layer = ({
         const i = 4 * (x + length * y);
 
         if ((x + y) % 2 == evens) {
-          /*data[i] = 255;
-          data[i+1] = 255;
-          data[i+2] = 255;*/
           data[i + 3] = 0;
         }
       }
