@@ -50,6 +50,13 @@ function App() {
 
   const handleSetLight = (mode: boolean) => {
     console.warn(mode);
+    if (!showSecret) {
+      if (isLight) {
+        setBgCol(COL_LIGHT);
+      } else {
+        setBgCol(COL_DARK);
+      }
+    }
     setIsLight(mode);
   };
 
@@ -101,17 +108,6 @@ function App() {
     }
     console.log(hue);
   };
-
-  //refactor, should be decoupled to showSecret?
-  useEffect(() => {
-    if (!showSecret) {
-      if (isLight) {
-        setBgCol(COL_LIGHT);
-      } else {
-        setBgCol(COL_DARK);
-      }
-    }
-  }, [isLight]);
 
   return (
     <>
