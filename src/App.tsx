@@ -51,13 +51,9 @@ function App() {
     setShowCircleMask(show);
   };
 
-  const handleClearLight = () => {
-    setImgLight(null);
-  };
+  const handleClearLight = () => {};
 
-  const handleClearDark = () => {
-    setImgDark(null);
-  };
+  const handleClearDark = () => {};
 
   const handleSaveImg = () => {
     console.log("Save image");
@@ -87,16 +83,15 @@ function App() {
 
   return (
     <>
-      <section id="canvasContainer">
-        <div
-          id="background"
-          style={{
-            width: `${LENGTH}px`,
-            height: `${LENGTH}px`,
-            zIndex: -1,
-            backgroundColor: bgCol,
-          }}
-        ></div>
+      <section
+        id="canvasContainer"
+        style={{
+          display: "relative",
+          width: `${LENGTH}px`,
+          height: `${LENGTH}px`,
+          backgroundColor: bgCol,
+        }}
+      >
         <Layer
           canvasRef={layerDark}
           isLight={false}

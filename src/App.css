@@ -9,10 +9,10 @@ canvas {
   position: absolute;
   top: 0;
   left: 0;
-  border: 2px gray solid;
 }
 #canvasContainer {
   position: relative;
+  border: 2px gray solid;
 }
 #toolbar {
   display: flex;

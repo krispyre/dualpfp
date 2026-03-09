@@ -48,11 +48,11 @@ const Toolbar = ({
   };
 
   const handleSetBrushSize = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSetBrushSize(Number(e.nativeEvent.target.value));
+    onSetBrushSize(Number(e.target.value));
   };
 
   const handleSetEraserSize = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSetEraserSize(Number(e.nativeEvent.target.value));
+    onSetEraserSize(Number(e.target.value));
   };
 
   const handleSetLight = (e: React.ChangeEvent<HTMLInputElement>) => {
