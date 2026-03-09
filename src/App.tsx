@@ -20,6 +20,9 @@ function App() {
   const layerLight = useRef(null);
   const layerDark = useRef(null);
 
+  const [shouldClearLight, setShouldClearLight] = useState(false);
+  const [shouldClearDark, setShouldClearDark] = useState(false);
+
   const [showSecret, setShowSecret] = useState(false);
   const [bgCol, setBgCol] = useState(COL_DARK);
 
@@ -52,9 +55,13 @@ function App() {
     setShowCircleMask(show);
   };
 
-  const handleClearLight = () => {};
+  const handleClearLight = () => {
+    setShouldClearLight(true);
+  };
 
-  const handleClearDark = () => {};
+  const handleClearDark = () => {
+    setShouldClearDark(true);
+  };
 
   const handleSaveImg = () => {
     console.log("Save image");
@@ -100,6 +107,8 @@ function App() {
           isEnabled={!isLight}
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
+          shouldClear={shouldClearDark}
+          onClear={() => setShouldClearDark(false)}
         />
         <Layer
           canvasRef={layerLight}
@@ -108,6 +117,8 @@ function App() {
           isEnabled={isLight}
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
+          shouldClear={shouldClearLight}
+          onClear={() => setShouldClearLight(false)}
         />
         <canvas id="ui" className="layer" width="" height=""></canvas>
         <CircleMask isEnabled={showCircleMask} length={LENGTH} />

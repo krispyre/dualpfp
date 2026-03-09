@@ -9,6 +9,8 @@ type LayerProps = {
   isEnabled: boolean;
   brushSize: number;
   isErase: boolean;
+  shouldClear: boolean;
+  onClear: (isLight: boolean) => void;
 };
 
 const Layer = ({
@@ -18,14 +20,14 @@ const Layer = ({
   isEnabled,
   brushSize,
   isErase,
+  shouldClear,
+  onClear,
 }: LayerProps) => {
   const BRUSH_COL = isLight ? COL_DARK : COL_LIGHT;
   const ctxRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastX, setLastX] = useState(0);
   const [lastY, setLastY] = useState(0);
-
-  const [z, setZ] = useState(isEnabled ? 1 : 0);
 
   //console.log("im lightmode", isLight);
 
@@ -60,6 +62,12 @@ const Layer = ({
     }
     ctx.putImageData(imgData, 0, 0);
     console.log("dither clear");
+  }
+
+  function clearLayer(isLight: boolean) {
+    if (!canvasRef || !ctxRef.current) return;
+    const ctx: CanvasRenderingContext2D = ctxRef.current;
+    ctx.clearRect(0, 0, length, length);
   }
 
   const handleClick = (e) => {
@@ -123,17 +131,28 @@ const Layer = ({
     console.log("change brush size to", brushSize);
   }, [brushSize]);
 
-  // dither clear alternatively
+  //dither clear
   useEffect(() => {
     ditherClear(isLight);
   }, [isDrawing]);
 
+  //clear layer
+  useEffect(() => {
+    if (shouldClear) {
+      clearLayer(isLight);
+      //fire event
+      onClear(isLight);
+    }
+  }, [shouldClear]);
+
+  //init
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !isEnabled) return;
     const ctx = canvas.getContext("2d")!;
     ctxRef.current = canvas.getContext("2d")!; // Store for draw()
 
+    ctx.imageSmoothingEnabled = false;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
     ctx.lineWidth = brushSize;
