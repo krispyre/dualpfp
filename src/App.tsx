@@ -35,9 +35,23 @@ function App() {
     setDrawHistory((prev) => {
       const newHist = [
         ...prev,
-        { action: "draw", path: newPath, isLight: isLight },
+        { action: "draw", path: newPath, isLight, isEraser },
       ];
       console.log(newHist);
+      // save a file for testing undo refresh
+      // if (newHist.length == 10) {
+      //   const jsonString = JSON.stringify(drawHistory, null, 2); // Pretty print
+      //   const blob = new Blob([jsonString], { type: "application/json" });
+      //   const url = URL.createObjectURL(blob);
+
+      //   const a = document.createElement("a");
+      //   a.href = url;
+      //   a.download = `draw-history-${Date.now()}.json`;
+      //   document.body.appendChild(a);
+      //   a.click();
+      //   document.body.removeChild(a);
+      //   URL.revokeObjectURL(url); // Cleanup
+      // }
       return newHist;
     });
   };
@@ -63,7 +77,6 @@ function App() {
   };
 
   const handleSetLight = (mode: boolean) => {
-    console.warn(mode);
     if (!showSecret) {
       if (mode) {
         setBgCol(COL_LIGHT);
@@ -72,11 +85,14 @@ function App() {
       }
     }
     setIsLight(mode);
-    // setDrawHistory((prev) => {
-    //   const newHist = [...prev, { action: "switch", isLight: isLight }];
-    //   console.log(newHist);
-    //   return newHist;
-    // });
+    setDrawHistory((prev) => {
+      const newHist = [
+        ...prev,
+        { action: "switch", isLight: !isLight, isEraser },
+      ];
+      console.log(newHist);
+      return newHist;
+    });
   };
 
   const handleSetCircleMask = (show: boolean) => {
@@ -85,10 +101,12 @@ function App() {
 
   const handleClearLight = () => {
     setShouldClearLight(true);
+    setDrawHistory((prev) => [...prev, { action: "clear", isLight }]);
   };
 
   const handleClearDark = () => {
     setShouldClearDark(true);
+    setDrawHistory((prev) => [...prev, { action: "clear", isLight }]);
   };
 
   const handleSaveImg = (filename: string) => {
@@ -125,7 +143,6 @@ function App() {
         setBgCol(COL_DARK);
       }
     }
-    console.log(hue);
   };
 
   return (

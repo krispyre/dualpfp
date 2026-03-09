@@ -120,7 +120,6 @@ const Layer = ({
     setCurPath([{ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }]);
     drawUnSmoothed(e);
     setIsDrawing(false);
-    addDrawHist(isLight, curPath);
     setCurPath([]);
   };
 

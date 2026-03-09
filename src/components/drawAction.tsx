@@ -3,7 +3,8 @@ export interface Point {
   y: number;
 }
 export interface DrawAction {
-  action: "switch" | "draw";
+  action: "switch" | "draw" | "clear";
   path?: Point[];
   isLight: boolean;
+  isEraser?: boolean;
 }
