@@ -21,7 +21,6 @@ const CircleMask = ({ isEnabled, length }) => {
       ctx.restore();
     } else {
       ctx.clearRect(0, 0, length, length);
-      //todo doesnt work ^^^
       console.log("hide mask");
     }
   }, [isEnabled]);
