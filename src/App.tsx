@@ -6,7 +6,7 @@ import Toolbar from "./components/toolbar";
 import "./App.css";
 import CircleMask from "./components/circleMask";
 
-const LENGTH = 512;
+const LENGTH = 256;
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
 const COL_RED = "hsl(353, 60%, 48%)";
@@ -25,6 +25,8 @@ function App() {
 
   const [showSecret, setShowSecret] = useState(false);
   const [bgCol, setBgCol] = useState(COL_DARK);
+
+  const [filename, setFilename] = useState("dualpfp");
 
   const handleSetEraser = (e) => {
     setIsEraser(e);
@@ -63,13 +65,32 @@ function App() {
     setShouldClearDark(true);
   };
 
-  const handleSaveImg = () => {
-    console.log("Save image");
+  const handleSaveImg = (filename: string) => {
+    const dark: HTMLCanvasElement = layerDark.current;
+    const light: HTMLCanvasElement = layerLight.current;
+
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = LENGTH;
+    exportCanvas.height = LENGTH;
+    const exportCtx = exportCanvas.getContext("2d");
+    exportCtx.globalCompositeOperation = "source-over";
+    exportCtx.drawImage(light, 0, 0);
+    exportCtx.drawImage(dark, 0, 0);
+
+    const exportLink = document.createElement("a");
+    exportLink.download = filename;
+    exportLink.href = exportCanvas.toDataURL("image/png");
+    window.open(exportLink.href, "_blank");
+
+    console.log(dark, "Save image");
   };
 
-  const handleShowSecret = (hue: number, isShow: boolean) => {
-    console.log(hue, isShow);
-    if (isShow) {
+  const handleToggleSecret = () => {
+    setShowSecret(!showSecret);
+    console.log(showSecret);
+  };
+  const handleShowSecret = (hue: number, isHover: boolean) => {
+    if (isHover || showSecret) {
       setBgCol(`hsl(${hue},10%,40%`);
     } else {
       if (isLight) {
@@ -78,14 +99,17 @@ function App() {
         setBgCol(COL_DARK);
       }
     }
+    console.log(hue);
   };
 
-  //refactor, should be decoupled to showSecret
+  //refactor, should be decoupled to showSecret?
   useEffect(() => {
-    if (isLight) {
-      setBgCol(COL_LIGHT);
-    } else {
-      setBgCol(COL_DARK);
+    if (!showSecret) {
+      if (isLight) {
+        setBgCol(COL_LIGHT);
+      } else {
+        setBgCol(COL_DARK);
+      }
     }
   }, [isLight]);
 
@@ -129,6 +153,7 @@ function App() {
         eraserSize={eraserSize}
         isLight={isLight}
         showCircleMask={showCircleMask}
+        showSecret={showSecret}
         onSetEraser={handleSetEraser}
         onUndo={handleUndo}
         onRedo={handleRedo}
@@ -139,6 +164,7 @@ function App() {
         onClearLight={handleClearLight}
         onClearDark={handleClearDark}
         onSaveImg={handleSaveImg}
+        onToggleSecret={handleToggleSecret}
         onShowSecret={handleShowSecret}
       />
     </>

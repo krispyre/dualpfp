@@ -1,9 +1,12 @@
+import { useState } from "react";
+
 type ToolbarProps = {
   isEraser: boolean;
   brushSize: number;
   eraserSize: number;
   isLight: boolean;
   showCircleMask: boolean;
+  showSecret: boolean;
   onSetEraser: (wub: boolean) => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -15,6 +18,7 @@ type ToolbarProps = {
   onClearDark: () => void;
   onSaveImg: (name: string) => void;
   onShowSecret: (hue: number, isShow: boolean) => void;
+  onToggleSecret: () => void;
 };
 
 const Toolbar = ({
@@ -23,6 +27,7 @@ const Toolbar = ({
   eraserSize,
   isLight,
   showCircleMask,
+  showSecret,
   onSetEraser,
   onUndo,
   onRedo,
@@ -34,7 +39,9 @@ const Toolbar = ({
   onClearDark,
   onSaveImg,
   onShowSecret,
+  onToggleSecret,
 }: ToolbarProps) => {
+  const [filename, setFilename] = useState("dualpfp");
   const handleSetEraser = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSetEraser(e.target.checked);
   };
@@ -72,11 +79,8 @@ const Toolbar = ({
     onClearDark();
   };
 
-  const handleSaveImg = () => {
-    const name =
-      (document.getElementById("filenameField") as HTMLInputElement)?.value ||
-      "default";
-    onSaveImg(name);
+  const handleSaveImg = (filename: string) => {
+    onSaveImg(filename);
   };
 
   return (
@@ -160,6 +164,7 @@ const Toolbar = ({
         </button>
         <br />
         <button
+          onClick={onToggleSecret}
           onMouseLeave={() => onShowSecret(0, false)}
           onMouseMove={(e) => {
             const hue = Math.round(
@@ -170,12 +175,18 @@ const Toolbar = ({
             onShowSecret(hue, true);
           }}
         >
-          reveal secret
+          {showSecret ? "regular bg" : "reveal secret"}
         </button>
         <hr />
         <div id="saveField">
-          <input type="text" placeholder="file name=>" id="filenameField" />
-          <button id="saveButton" onClick={handleSaveImg}>
+          <input
+            type="text"
+            placeholder="pfp"
+            id="filenameField"
+            value={filename}
+            onChange={(e) => setFilename(e.target.value)}
+          />
+          <button id="saveButton" onClick={() => handleSaveImg(filename)}>
             save image
           </button>
         </div>
