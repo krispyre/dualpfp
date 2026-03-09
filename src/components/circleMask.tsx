@@ -32,7 +32,7 @@ const CircleMask = ({ isEnabled, length }) => {
       className="layer"
       width={length}
       height={length}
-      style={{ zIndex: 2 }}
+      style={{ zIndex: 2, pointerEvents: "none" }}
     ></canvas>
   );
 };
