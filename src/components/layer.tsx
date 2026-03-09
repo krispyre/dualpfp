@@ -70,7 +70,6 @@ const Layer = ({
 
   const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(false);
-    ditherClear(isLight);
     // console.log("canvas: mouseup");
   };
 
@@ -124,10 +123,10 @@ const Layer = ({
     console.log("change brush size to", brushSize);
   }, [brushSize]);
 
-  //dither clear alternatively
-  // useEffect(() => {
-  //   ditherClear(isLight);
-  // }, [isDrawing]);
+  // dither clear alternatively
+  useEffect(() => {
+    ditherClear(isLight);
+  }, [isDrawing]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

@@ -9,7 +9,7 @@ const CircleMask = ({ isEnabled, length }) => {
     if (isEnabled) {
       console.log("show mask");
       ctx.save();
-      ctx.fillStyle = "rgba(0, 0, 0, .3)";
+      ctx.fillStyle = "rgba(0, 0, 0, .7)";
       ctx.fillRect(0, 0, length, length);
 
       ctx.beginPath();
@@ -32,6 +32,7 @@ const CircleMask = ({ isEnabled, length }) => {
       className="layer"
       width={length}
       height={length}
+      style={{ zIndex: 2 }}
     ></canvas>
   );
 };
