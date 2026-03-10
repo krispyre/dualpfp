@@ -13,7 +13,13 @@ const CircleMask = ({ isEnabled, length }) => {
       ctx.fillRect(0, 0, length, length);
 
       ctx.beginPath();
-      ctx.arc(255, 255, 255, 0, Math.PI * 2);
+      ctx.arc(
+        Math.floor(length / 2),
+        Math.floor(length / 2),
+        Math.floor(length / 2),
+        0,
+        Math.PI * 2,
+      );
       ctx.closePath();
       ctx.clip();
 
