@@ -115,6 +115,7 @@ const Toolbar = ({
             value={brushSize}
             onChange={handleSetBrushSize}
           />
+          <label htmlFor="brushSize">{brushSize}</label>
         </div>
         <div id="eraserSettings">
           <label htmlFor="eraserSize">eraser size</label>
@@ -127,6 +128,7 @@ const Toolbar = ({
             value={eraserSize}
             onChange={handleSetEraserSize}
           />
+          <label htmlFor="brushSize">{eraserSize}</label>
         </div>
         <div>
           <label htmlFor="isLight">light mode?</label>

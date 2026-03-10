@@ -189,7 +189,7 @@ const Layer = ({
     const ctx: CanvasRenderingContext2D = ctxRef.current;
     //eraser size is updated in brushSize
     ctx.lineWidth = brushSize;
-    console.log("change brush size to", brushSize);
+    // console.log("change brush size to", brushSize);
   }, [brushSize]);
 
   //dither clear
