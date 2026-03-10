@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import type { Point } from "./drawAction.js";
+import type { DrawAction, Point } from "./drawAction.js";
 
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
 
 type LayerProps = {
+  drawHistory: DrawAction[];
   canvasRef: React.RefObject<HTMLCanvasElement>;
   isLight: boolean;
   length: number;
@@ -19,6 +20,7 @@ type LayerProps = {
 };
 
 const Layer = ({
+  drawHistory,
   canvasRef,
   isLight,
   length,
@@ -26,6 +28,7 @@ const Layer = ({
   brushSize,
   isErase,
   shouldClear,
+  shouldUndo,
   onClear,
   onUndo,
   addDrawHist,
@@ -49,7 +52,7 @@ const Layer = ({
     ctx.stroke();
   }
 
-  function draw(points, f = 0.3, t = 1) {
+  function draw(points: Point[], f = 0.3, t = 1) {
     //i stole this smoothing thing from perplexity idc
     if (!isDrawing || !ctxRef.current || !isEnabled) return;
 
