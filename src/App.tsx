@@ -7,7 +7,7 @@ import "./App.css";
 import CircleMask from "./components/circleMask";
 import type { DrawAction, Point } from "./components/drawAction";
 
-const LENGTH = 512;
+const LENGTH = 360;
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
 const COL_RED = "hsl(353, 60%, 48%)";
@@ -157,6 +157,7 @@ function App() {
         }}
       >
         <Layer
+          drawHistory={drawHistory}
           canvasRef={layerDark}
           isLight={false}
           length={LENGTH}
@@ -168,6 +169,7 @@ function App() {
           addDrawHist={addDrawHist}
         />
         <Layer
+          drawHistory={drawHistory}
           canvasRef={layerLight}
           isLight={true}
           length={LENGTH}
