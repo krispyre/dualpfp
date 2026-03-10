@@ -29,15 +29,17 @@ function App() {
   const [bgCol, setBgCol] = useState(COL_DARK);
 
   const [drawHistory, setDrawHistory] = useState<DrawAction[]>([]);
+  const [shouldUndo, setShouldUndo] = useState(false);
   const [drawStep, setDrawStep] = useState(0); //todo for redo
 
   const addDrawHist = (isLight: boolean, newPath: Point[]) => {
     setDrawHistory((prev) => {
+      const size = isEraser ? eraserSize : brushSize;
       const newHist = [
         ...prev,
-        { action: "draw", path: newPath, isLight, isEraser },
+        { action: "draw", path: newPath, isLight, isEraser, brushSize: size },
       ];
-      console.log(newHist);
+      console.log("drawHist:", newHist);
       // save a file for testing undo refresh
       // if (newHist.length == 10) {
       //   const jsonString = JSON.stringify(drawHistory, null, 2); // Pretty print
@@ -61,6 +63,8 @@ function App() {
   };
 
   const handleUndo = () => {
+    setDrawHistory((prev) => prev.slice(0, -1));
+    setShouldUndo(true);
     console.log("Undo action");
   };
 
@@ -90,7 +94,6 @@ function App() {
         ...prev,
         { action: "switch", isLight: !isLight, isEraser },
       ];
-      console.log(newHist);
       return newHist;
     });
   };
@@ -165,7 +168,9 @@ function App() {
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
           shouldClear={shouldClearDark}
+          shouldUndo={shouldUndo}
           onClear={() => setShouldClearDark(false)}
+          onUndo={() => setShouldUndo(false)}
           addDrawHist={addDrawHist}
         />
         <Layer
@@ -177,7 +182,9 @@ function App() {
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
           shouldClear={shouldClearLight}
+          shouldUndo={shouldUndo}
           onClear={() => setShouldClearLight(false)}
+          onUndo={() => setShouldUndo(false)}
           addDrawHist={addDrawHist}
         />
         <canvas id="ui" className="layer" width="" height=""></canvas>

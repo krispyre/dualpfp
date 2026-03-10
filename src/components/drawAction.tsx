@@ -7,4 +7,5 @@ export interface DrawAction {
   path?: Point[];
   isLight: boolean;
   isEraser?: boolean;
+  brushSize?: number;
 }

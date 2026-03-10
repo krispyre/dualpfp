@@ -15,7 +15,7 @@ type LayerProps = {
   shouldClear: boolean;
   shouldUndo: boolean;
   onClear: (isLight: boolean) => void;
-  onUndo: (isLight: boolean) => void;
+  onUndo: () => void;
   addDrawHist: (isLight: boolean, newPath: Point[]) => void;
 };
 
@@ -39,7 +39,6 @@ const Layer = ({
   const [lastX, setLastX] = useState(0);
   const [lastY, setLastY] = useState(0);
   const [curPath, setCurPath] = useState([]);
-
   //console.log("im lightmode", isLight);
 
   function drawUnSmoothed(e: React.MouseEvent<HTMLCanvasElement>) {
@@ -52,9 +51,15 @@ const Layer = ({
     ctx.stroke();
   }
 
-  function draw(points: Point[], f = 0.3, t = 1) {
+  function draw(isRefreshing: boolean, points: Point[], f = 0.3, t = 1) {
+    // todo remove the isRefreshing thing later
+
     //i stole this smoothing thing from perplexity idc
-    if (!isDrawing || !ctxRef.current || !isEnabled) return;
+    // console.log(isRefreshing, isDrawing, !!ctxRef.current, isEnabled);
+    // all of these must satisfy
+    if (!(ctxRef.current && isEnabled)) return;
+    //either one must satisfy
+    if (!(isRefreshing || isDrawing)) return;
 
     const ctx: CanvasRenderingContext2D = ctxRef.current;
     ctx.beginPath();
@@ -87,7 +92,46 @@ const Layer = ({
       dy1 = dy2;
       preP = curP;
     }
+    // console.log("stroke");
     ctx.stroke();
+  }
+
+  function refresh() {
+    // console.warn(!!canvasRef, !!ctxRef.current);
+    if (!canvasRef || !ctxRef.current) return;
+    const ctx: CanvasRenderingContext2D = ctxRef.current;
+    console.group("refresh using", drawHistory);
+
+    clearLayer();
+
+    for (const step of drawHistory) {
+      if (step.isLight == isLight) {
+        switch (step.action) {
+          case "clear":
+            console.log("clear layer");
+            clearLayer();
+            break;
+          case "draw":
+            if (step.isEraser) {
+              ctx.strokeStyle = "rgba(0,0,0,1)";
+              ctx.globalCompositeOperation = "destination-out"; //Uh idk it kinda worked lol
+            } else {
+              ctx.strokeStyle = BRUSH_COL;
+              ctx.globalCompositeOperation = "source-over";
+            }
+            ctx.lineWidth = step.brushSize;
+            console.log("draw", step.path);
+            draw(true, step.path);
+            break;
+          case "switch":
+            console.log("switch is not my problem");
+            break;
+          default:
+            console.error("unknown step", step.action);
+        }
+      }
+    }
+    console.groupEnd();
   }
 
   function ditherClear(isLight: boolean) {
@@ -108,10 +152,10 @@ const Layer = ({
       }
     }
     ctx.putImageData(imgData, 0, 0);
-    console.log("dither clear");
+    // console.log("dither clear");
   }
 
-  function clearLayer(isLight: boolean) {
+  function clearLayer() {
     if (!canvasRef || !ctxRef.current) return;
     const ctx: CanvasRenderingContext2D = ctxRef.current;
     ctx.clearRect(0, 0, length, length);
@@ -127,9 +171,11 @@ const Layer = ({
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    // console.warn(e.nativeEvent.target); // doesnt fire on button clicks
     setIsDrawing(false);
     addDrawHist(isLight, curPath);
     setCurPath([]);
+
     // console.log("canvas: mouseup");
   };
 
@@ -146,7 +192,7 @@ const Layer = ({
       { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY },
     ]);
     if (e.buttons == 1) {
-      draw(curPath);
+      draw(false, curPath);
       // console.log(curPath);
     }
 
@@ -180,7 +226,7 @@ const Layer = ({
       ctx.strokeStyle = BRUSH_COL;
       ctx.globalCompositeOperation = "source-over";
     }
-    console.warn("change erase to", isErase);
+    // console.warn("change erase to", isErase);
   }, [isErase]);
 
   //change pen size
@@ -202,12 +248,27 @@ const Layer = ({
   //clear layer
   useEffect(() => {
     if (shouldClear) {
-      clearLayer(isLight);
+      clearLayer();
       //fire event
       onClear(isLight);
     }
   }, [shouldClear]);
 
+  //undo+redo
+  useEffect(() => {
+    if (shouldUndo) {
+      refresh();
+      onUndo();
+    }
+  }, [drawHistory]);
+  async function loadData() {
+    const res = await fetch("./dhexample1.json");
+    if (!res.ok) throw new Error("Network error: " + res.status);
+    const data = await res.json(); // parsed JS value
+    console.log(data);
+
+    refresh(data);
+  }
   //init
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -220,6 +281,8 @@ const Layer = ({
     ctx.lineCap = "round";
     ctx.lineWidth = brushSize;
     ctx.strokeStyle = BRUSH_COL;
+
+    // loadData();
   }, [canvasRef, isEnabled]);
 
   return (
