@@ -145,7 +145,7 @@ function App() {
 
   const handleToggleSecret = () => {
     setShowSecret(!showSecret);
-    console.log(showSecret);
+    console.log("showsecret:", showSecret);
   };
   const handleShowSecret = (hue: number, isHover: boolean) => {
     if (isHover || showSecret) {
@@ -163,7 +163,6 @@ function App() {
     // i just moved this from handleSetLight idk man optimize this with reducer probably idk
     //if undoed switch, switch mode back to lastest mode too
     if (drawHistory.length >= 1) {
-      console.log(drawHistory.at(-1).isLight);
       const mode = drawHistory.at(-1).isLight;
 
       if (!showSecret) {

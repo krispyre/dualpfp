@@ -134,6 +134,17 @@ const Layer = ({
       }
       ditherClear(isLight);
     }
+
+    //restore brush sizes
+    ctx.lineWidth = brushSize;
+    if (isErase) {
+      ctx.strokeStyle = "rgba(0,0,0,1)";
+      ctx.globalCompositeOperation = "destination-out"; //Uh idk it kinda worked lol
+    } else {
+      ctx.strokeStyle = BRUSH_COL;
+      ctx.globalCompositeOperation = "source-over";
+    }
+
     console.groupEnd();
   }
 
@@ -148,7 +159,7 @@ const Layer = ({
     for (let y = 0; y < length; y++) {
       for (let x = 0; x < length; x++) {
         const i = 4 * (x + length * y);
-        data[i + 3] = data[i + 3] < 255 ? 0 : 255;
+        data[i + 3] = data[i + 3] < 128 ? 0 : 255;
 
         if ((x + y) % 2 == evens) {
           data[i + 3] = 0;
@@ -290,7 +301,7 @@ const Layer = ({
 
     ctx.imageSmoothingEnabled = false;
     ctx.lineJoin = "round";
-    ctx.lineCap = "square";
+    ctx.lineCap = "round";
     ctx.lineWidth = brushSize;
     ctx.strokeStyle = BRUSH_COL;
 
