@@ -8,7 +8,6 @@ import CircleMask from "./components/circleMask";
 import type { DrawAction, Point } from "./components/drawAction";
 
 const LENGTH = 80;
-const screenLength = "200px";
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
 const COL_RED = "hsl(353, 60%, 48%)";
@@ -160,9 +159,6 @@ function App() {
       <section
         id="canvasContainer"
         style={{
-          display: "relative",
-          width: `${screenLength}`,
-          height: `${screenLength}`,
           backgroundColor: bgCol,
         }}
       >
@@ -171,7 +167,6 @@ function App() {
           canvasRef={layerDark}
           isLight={false}
           length={LENGTH}
-          screenLength={screenLength}
           isEnabled={!isLight}
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
@@ -186,7 +181,6 @@ function App() {
           canvasRef={layerLight}
           isLight={true}
           length={LENGTH}
-          screenLength={screenLength}
           isEnabled={isLight}
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
@@ -196,7 +190,7 @@ function App() {
           onUndo={() => setShouldUndo(false)}
           addDrawHist={addDrawHist}
         />
-        <canvas id="ui" className="layer" width="" height=""></canvas>
+        <canvas id="ui" className="layer" width={LENGTH}></canvas>
         <CircleMask isEnabled={showCircleMask} length={LENGTH} />
       </section>
       <Toolbar

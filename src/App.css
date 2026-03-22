@@ -1,9 +1,16 @@
+:root {
+  --cDisplayLength: 60vh;
+}
+
 #root {
   max-height: 100vh;
   /* max-width: 1280px; */
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
 }
 
 canvas {
@@ -11,10 +18,18 @@ canvas {
   top: 0;
   left: 0;
   image-rendering: pixelated;
+  width: var(--cDisplayLength);
+  min-width: 100px;
+  min-height: 100px;
+  aspect-ratio: 1;
 }
 #canvasContainer {
   position: relative;
   border: 2px gray solid;
+  width: var(--cDisplayLength);
+  min-width: 100px;
+  min-height: 100px;
+  aspect-ratio: 1;
 }
 #toolbar {
   display: flex;

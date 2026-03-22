@@ -9,7 +9,6 @@ type LayerProps = {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   isLight: boolean;
   length: number;
-  screenLength: string; //for css
   isEnabled: boolean;
   brushSize: number;
   isErase: boolean;
@@ -25,7 +24,6 @@ const Layer = ({
   canvasRef,
   isLight,
   length,
-  screenLength,
   isEnabled,
   brushSize,
   isErase,
@@ -174,7 +172,7 @@ const Layer = ({
     setCurPath([]);
   };
 
-  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+  const handlePointerUp = () => {
     // console.warn(e.nativeEvent.target); // doesnt fire on button clicks
     setIsDrawing(false);
     addDrawHist(isLight, curPath);
@@ -217,7 +215,7 @@ const Layer = ({
       setIsDrawing(false);
     }
   };
-  const handlePointerLeave = (e) => {
+  const handlePointerLeave = () => {
     setIsDrawing(false);
     setCurPath([]);
   };
@@ -311,7 +309,6 @@ const Layer = ({
       onPointerLeave={handlePointerLeave}
       style={{
         zIndex: isEnabled ? 2 : 1,
-        width: screenLength,
       }}
       id={isLight ? "li" : "da"}
     >
