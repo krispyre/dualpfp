@@ -9,6 +9,7 @@ type LayerProps = {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   isLight: boolean;
   length: number;
+  screenLength: string; //for css
   isEnabled: boolean;
   brushSize: number;
   isErase: boolean;
@@ -24,6 +25,7 @@ const Layer = ({
   canvasRef,
   isLight,
   length,
+  screenLength,
   isEnabled,
   brushSize,
   isErase,
@@ -35,6 +37,7 @@ const Layer = ({
 }: LayerProps) => {
   const BRUSH_COL = isLight ? COL_DARK : COL_LIGHT;
   const ctxRef = useRef(null);
+  const [actualLength, setActualLength] = useState(length);
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastX, setLastX] = useState(0);
   const [lastY, setLastY] = useState(0);
@@ -96,15 +99,16 @@ const Layer = ({
     ctx.stroke();
   }
 
-  function refresh() {
+  function refresh(customData = null) {
     // console.warn(!!canvasRef, !!ctxRef.current);
     if (!canvasRef || !ctxRef.current) return;
     const ctx: CanvasRenderingContext2D = ctxRef.current;
-    console.group("refresh using", drawHistory);
+    const steps = customData || drawHistory;
+    console.group("refresh using", steps);
 
     clearLayer();
 
-    for (const step of drawHistory) {
+    for (const step of steps) {
       if (step.isLight == isLight) {
         switch (step.action) {
           case "clear":
@@ -181,16 +185,19 @@ const Layer = ({
 
   const handleMouseDown = (e) => {
     setIsDrawing(true);
-    setCurPath([{ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }]);
+    const x = (e.nativeEvent.offsetX / actualLength) * length;
+    const y = (e.nativeEvent.offsetY / actualLength) * length;
+    setCurPath([{ x, y }]);
 
     // console.log("canvas: mousedown");
   };
 
   const handleMouseMove = (e) => {
-    setCurPath((prev) => [
-      ...prev,
-      { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY },
-    ]);
+    setCurPath((prev) => {
+      const x = (e.nativeEvent.offsetX / actualLength) * length;
+      const y = (e.nativeEvent.offsetY / actualLength) * length;
+      return [...prev, { x, y }];
+    });
     if (e.buttons == 1) {
       draw(false, curPath);
       // console.log(curPath);
@@ -276,6 +283,12 @@ const Layer = ({
     const ctx = canvas.getContext("2d")!;
     ctxRef.current = canvas.getContext("2d")!; // Store for draw()
 
+    setActualLength(() => {
+      const owo = canvas.getBoundingClientRect().width;
+      console.log(owo);
+      return owo;
+    });
+
     ctx.imageSmoothingEnabled = false;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
@@ -298,6 +311,7 @@ const Layer = ({
       onMouseLeave={handleMouseLeave}
       style={{
         zIndex: isEnabled ? 2 : 1,
+        width: screenLength,
       }}
       id={isLight ? "li" : "da"}
     >

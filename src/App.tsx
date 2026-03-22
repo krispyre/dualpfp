@@ -7,7 +7,8 @@ import "./App.css";
 import CircleMask from "./components/circleMask";
 import type { DrawAction, Point } from "./components/drawAction";
 
-const LENGTH = 360;
+const LENGTH = 80;
+const screenLength = "200px";
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
 const COL_RED = "hsl(353, 60%, 48%)";
@@ -36,8 +37,14 @@ function App() {
     setDrawHistory((prev) => {
       const size = isEraser ? eraserSize : brushSize;
       const newHist = [
-        ...prev,
-        { action: "draw", path: newPath, isLight, isEraser, brushSize: size },
+        ...prev, // wtf is as const yo
+        {
+          action: "draw" as const,
+          path: newPath,
+          isLight: isLight,
+          isEraser,
+          brushSize: size,
+        },
       ];
       console.log("drawHist:", newHist);
       // save a file for testing undo refresh
@@ -92,7 +99,7 @@ function App() {
     setDrawHistory((prev) => {
       const newHist = [
         ...prev,
-        { action: "switch", isLight: !isLight, isEraser },
+        { action: "switch" as const, isLight: !isLight, isEraser },
       ];
       return newHist;
     });
@@ -154,8 +161,8 @@ function App() {
         id="canvasContainer"
         style={{
           display: "relative",
-          width: `${LENGTH}px`,
-          height: `${LENGTH}px`,
+          width: `${screenLength}`,
+          height: `${screenLength}`,
           backgroundColor: bgCol,
         }}
       >
@@ -164,6 +171,7 @@ function App() {
           canvasRef={layerDark}
           isLight={false}
           length={LENGTH}
+          screenLength={screenLength}
           isEnabled={!isLight}
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
@@ -178,6 +186,7 @@ function App() {
           canvasRef={layerLight}
           isLight={true}
           length={LENGTH}
+          screenLength={screenLength}
           isEnabled={isLight}
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
