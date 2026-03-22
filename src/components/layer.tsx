@@ -47,7 +47,7 @@ const Layer = ({
 
     const ctx: CanvasRenderingContext2D = ctxRef.current;
     ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
+    ctx.moveTo(curPath[-1].x, curPath[-1].y);
     ctx.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     ctx.stroke();
   }
@@ -132,6 +132,7 @@ const Layer = ({
             console.error("unknown step", step.action);
         }
       }
+      ditherClear(isLight);
     }
     console.groupEnd();
   }
@@ -147,6 +148,7 @@ const Layer = ({
     for (let y = 0; y < length; y++) {
       for (let x = 0; x < length; x++) {
         const i = 4 * (x + length * y);
+        data[i + 3] = data[i + 3] < 255 ? 0 : 255;
 
         if ((x + y) % 2 == evens) {
           data[i + 3] = 0;
@@ -283,13 +285,12 @@ const Layer = ({
 
     setActualLength(() => {
       const owo = canvas.getBoundingClientRect().width;
-      console.log(owo);
       return owo;
     });
 
     ctx.imageSmoothingEnabled = false;
     ctx.lineJoin = "round";
-    ctx.lineCap = "round";
+    ctx.lineCap = "square";
     ctx.lineWidth = brushSize;
     ctx.strokeStyle = BRUSH_COL;
 

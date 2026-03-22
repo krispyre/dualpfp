@@ -70,7 +70,11 @@ function App() {
 
   const handleUndo = () => {
     setDrawHistory((prev) => prev.slice(0, -1));
-    setShouldUndo(true);
+    setShouldUndo(() => {
+      return true;
+    });
+    //if undoed switch, change the bg col too
+
     console.log("Undo action");
   };
 
@@ -98,8 +102,9 @@ function App() {
     setDrawHistory((prev) => {
       const newHist = [
         ...prev,
-        { action: "switch" as const, isLight: !isLight, isEraser },
+        { action: "switch" as const, isLight: mode, isEraser },
       ];
+      console.log("drawHist:", newHist);
       return newHist;
     });
   };
@@ -153,6 +158,24 @@ function App() {
       }
     }
   };
+
+  useEffect(() => {
+    // i just moved this from handleSetLight idk man optimize this with reducer probably idk
+    //if undoed switch, switch mode back to lastest mode too
+    if (drawHistory.length >= 1) {
+      console.log(drawHistory.at(-1).isLight);
+      const mode = drawHistory.at(-1).isLight;
+
+      if (!showSecret) {
+        if (mode) {
+          setBgCol(COL_LIGHT);
+        } else {
+          setBgCol(COL_DARK);
+        }
+      }
+      setIsLight(mode);
+    }
+  }, [drawHistory]);
 
   return (
     <>
