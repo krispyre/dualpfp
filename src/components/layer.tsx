@@ -209,7 +209,7 @@ const Layer = ({
       const y = (e.nativeEvent.offsetY / actualLength) * length;
       return [...prev, { x, y }];
     });
-    if (e.buttons == 1) {
+    if (e.buttons == 1 || e.pointerType == "touch") {
       draw(false, curPath);
       // console.log(curPath);
     }
@@ -220,7 +220,7 @@ const Layer = ({
   };
 
   const handlePointerEnter = (e) => {
-    if (e.buttons == 1) {
+    if (e.buttons == 1 || e.pointerType == "touch") {
       setIsDrawing(true);
       setLastX(e.nativeEvent.offsetX);
       setLastY(e.nativeEvent.offsetY);
