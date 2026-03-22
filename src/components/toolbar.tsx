@@ -167,8 +167,8 @@ const Toolbar = ({
         <br />
         <button
           onClick={onToggleSecret}
-          onMouseLeave={() => onShowSecret(0, false)}
-          onMouseMove={(e) => {
+          onPointerLeave={() => onShowSecret(0, false)}
+          onPointerMove={(e) => {
             const hue = Math.round(
               (e.nativeEvent.offsetX / (e.target as HTMLElement).clientWidth) *
                 255,

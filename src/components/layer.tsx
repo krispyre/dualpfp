@@ -44,7 +44,7 @@ const Layer = ({
   const [curPath, setCurPath] = useState([]);
   //console.log("im lightmode", isLight);
 
-  function drawUnSmoothed(e: React.MouseEvent<HTMLCanvasElement>) {
+  function drawUnSmoothed(e: React.PointerEvent<HTMLCanvasElement>) {
     if (!isDrawing || !ctxRef.current || !isEnabled) return;
 
     const ctx: CanvasRenderingContext2D = ctxRef.current;
@@ -165,7 +165,7 @@ const Layer = ({
     ctx.clearRect(0, 0, length, length);
   }
 
-  const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleClick = (e: React.PointerEvent<HTMLCanvasElement>) => {
     //toodoo doesnot work
     setIsDrawing(true);
     setCurPath([{ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }]);
@@ -174,7 +174,7 @@ const Layer = ({
     setCurPath([]);
   };
 
-  const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     // console.warn(e.nativeEvent.target); // doesnt fire on button clicks
     setIsDrawing(false);
     addDrawHist(isLight, curPath);
@@ -183,7 +183,7 @@ const Layer = ({
     // console.log("canvas: mouseup");
   };
 
-  const handleMouseDown = (e) => {
+  const handlePointerDown = (e) => {
     setIsDrawing(true);
     const x = (e.nativeEvent.offsetX / actualLength) * length;
     const y = (e.nativeEvent.offsetY / actualLength) * length;
@@ -192,7 +192,7 @@ const Layer = ({
     // console.log("canvas: mousedown");
   };
 
-  const handleMouseMove = (e) => {
+  const handlePointerMove = (e) => {
     setCurPath((prev) => {
       const x = (e.nativeEvent.offsetX / actualLength) * length;
       const y = (e.nativeEvent.offsetY / actualLength) * length;
@@ -208,7 +208,7 @@ const Layer = ({
     // console.log("canvas: mouse move");
   };
 
-  const handleMouseEnter = (e) => {
+  const handlePointerEnter = (e) => {
     if (e.buttons == 1) {
       setIsDrawing(true);
       setLastX(e.nativeEvent.offsetX);
@@ -217,7 +217,7 @@ const Layer = ({
       setIsDrawing(false);
     }
   };
-  const handleMouseLeave = (e) => {
+  const handlePointerLeave = (e) => {
     setIsDrawing(false);
     setCurPath([]);
   };
@@ -304,11 +304,11 @@ const Layer = ({
       width={length}
       height={length}
       onClick={handleClick}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerMove={handlePointerMove}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       style={{
         zIndex: isEnabled ? 2 : 1,
         width: screenLength,
