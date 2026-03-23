@@ -52,49 +52,53 @@ const Layer = ({
     ctx.stroke();
   }
 
-  function draw(isRefreshing: boolean, points: Point[], f = 0.3, t = 1) {
-    // todo remove the isRefreshing thing later
+  function draw(isRefreshing: boolean, points: Point[]) {
+    // todo remove the isRefreshing thing later if possible
+    // if not refreshing it is added by a new stroke, not redrawn from undos
 
-    //i stole this smoothing thing from perplexity idc
-    // console.log(isRefreshing, isDrawing, !!ctxRef.current, isEnabled);
+    //i stole this smoothing thing from gemini idc
+
+    if (points.length < 2) return;
+    const ctx = ctxRef.current;
+
     // all of these must satisfy
-    if (!(ctxRef.current && isEnabled)) return;
+    if (!(ctx && isEnabled)) return;
     //either one must satisfy
     if (!(isRefreshing || isDrawing)) return;
+    // 1. Important: Use floor/round coordinates to snap to the pixel grid
+    const drawPixel = (x, y) => {
+      // Rounding is what prevents the semi-transparency
+      ctx.fillRect(Math.floor(x), Math.floor(y), brushSize, brushSize);
+    };
 
-    const ctx: CanvasRenderingContext2D = ctxRef.current;
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-    let preP = points[0],
-      dx1 = 0,
-      dy1 = 0;
-    for (let i = 1; i < points.length; i++) {
-      const curP = points[i];
-      const nexP = points[i + 1] || {
-        x: curP.x + (curP.x - preP.x),
-        y: curP.y,
-      }; // Extrapolate end
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 =
+        i === 0
+          ? points[0]
+          : {
+              x: (points[i - 1].x + points[i].x) / 2,
+              y: (points[i - 1].y + points[i].y) / 2,
+            };
+      const p1 = points[i];
+      const p2 = {
+        x: (points[i].x + points[i + 1].x) / 2,
+        y: (points[i].y + points[i + 1].y) / 2,
+      };
 
-      // Safe slope: avoid div-by-zero
-      const dx = nexP.x - preP.x;
-      const safeM = dx !== 0 ? (nexP.y - preP.y) / dx : 0; // Default horizontal if vertical
+      // 2. Step through the curve (t goes from 0 to 1)
+      // We increase 't' by a small amount based on distance to ensure no gaps
+      const distance = Math.hypot(p2.x - p0.x, p2.y - p0.y);
+      const steps = Math.max(distance, 10); // Adjust density based on length
 
-      const dx2 = (nexP.x - curP.x) * -f;
-      const dy2 = dx2 * safeM * t;
-      ctx.bezierCurveTo(
-        preP.x - dx1,
-        preP.y - dy1,
-        curP.x + dx2,
-        curP.y + dy2,
-        curP.x,
-        curP.y,
-      );
-      dx1 = dx2;
-      dy1 = dy2;
-      preP = curP;
+      for (let t = 0; t <= 1; t += 1 / steps) {
+        // Quadratic Bezier formula:
+        // B(t) = (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
+        const x = (1 - t) ** 2 * p0.x + 2 * (1 - t) * t * p1.x + t ** 2 * p2.x;
+        const y = (1 - t) ** 2 * p0.y + 2 * (1 - t) * t * p1.y + t ** 2 * p2.y;
+
+        drawPixel(x, y);
+      }
     }
-    // console.log("stroke");
-    ctx.stroke();
   }
 
   function refresh(customData = null) {
@@ -116,9 +120,11 @@ const Layer = ({
           case "draw":
             if (step.isEraser) {
               ctx.strokeStyle = "rgba(0,0,0,1)";
+              ctx.fillStyle = "rgba(0,0,0,1)";
               ctx.globalCompositeOperation = "destination-out"; //Uh idk it kinda worked lol
             } else {
               ctx.strokeStyle = BRUSH_COL;
+              ctx.fillStyle = BRUSH_COL;
               ctx.globalCompositeOperation = "source-over";
             }
             ctx.lineWidth = step.brushSize;
@@ -139,9 +145,12 @@ const Layer = ({
     ctx.lineWidth = brushSize;
     if (isErase) {
       ctx.strokeStyle = "rgba(0,0,0,1)";
+      ctx.fillStyle = "rgba(0,0,0,1)";
       ctx.globalCompositeOperation = "destination-out"; //Uh idk it kinda worked lol
     } else {
       ctx.strokeStyle = BRUSH_COL;
+      ctx.fillStyle = BRUSH_COL;
+
       ctx.globalCompositeOperation = "source-over";
     }
 
@@ -150,6 +159,7 @@ const Layer = ({
 
   function ditherClear(isLight: boolean) {
     if (!canvasRef || !ctxRef.current) return;
+    console.warn("di clear");
     //called on release
     const evens = isLight ? 0 : 1; //even pixels erased for light mode
     const ctx: CanvasRenderingContext2D = ctxRef.current;
@@ -239,9 +249,11 @@ const Layer = ({
     const ctx: CanvasRenderingContext2D = ctxRef.current;
     if (isErase) {
       ctx.strokeStyle = "rgba(0,0,0,1)";
+      ctx.fillStyle = "rgba(0,0,0,1)";
       ctx.globalCompositeOperation = "destination-out"; //Uh idk it kinda worked lol
     } else {
       ctx.strokeStyle = BRUSH_COL;
+      ctx.fillStyle = BRUSH_COL;
       ctx.globalCompositeOperation = "source-over";
     }
     // console.warn("change erase to", isErase);
@@ -301,9 +313,10 @@ const Layer = ({
 
     ctx.imageSmoothingEnabled = false;
     ctx.lineJoin = "round";
-    ctx.lineCap = "round";
+    ctx.lineCap = "butt";
     ctx.lineWidth = brushSize;
     ctx.strokeStyle = BRUSH_COL;
+    ctx.fillStyle = BRUSH_COL;
 
     // loadData();
   }, [canvasRef, isEnabled]);
