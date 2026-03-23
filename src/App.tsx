@@ -144,10 +144,17 @@ function App() {
   };
 
   const handleToggleSecret = () => {
-    setShowSecret(!showSecret);
-    console.log("showsecret:", showSecret);
+    setShowSecret((prev) => {
+      console.log("showsecret:", !prev);
+      return !prev;
+    });
   };
+
+  // todo too vague, when is it even called
   const handleShowSecret = (hue: number, isHover: boolean) => {
+    // noShow => (set) pointerEnter => (set) click => (set) yesShow => (set) pointerLeave => (set) still yesShow
+    // (set) yesShow => (set) pointerEnter => (TURN OFF) click => noShow => pointerLeave => still noShow
+
     if (isHover || showSecret) {
       setBgCol(`hsl(${hue},10%,40%`);
     } else {

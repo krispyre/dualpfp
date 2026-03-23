@@ -109,7 +109,7 @@ const Toolbar = ({
           <input
             type="range"
             min="1"
-            max="100"
+            max="10"
             id="brushSize"
             name="brushSize"
             value={brushSize}
@@ -122,7 +122,7 @@ const Toolbar = ({
           <input
             type="range"
             min="1"
-            max="100"
+            max="10"
             id="eraserSize"
             name="eraserSize"
             value={eraserSize}
