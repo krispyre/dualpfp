@@ -4,6 +4,7 @@ const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
 
 export type State = {
+  secretHue: number;
   drawHistory: DrawAction[];
   stepCount: number;
   maxStepCount: number;
@@ -33,9 +34,10 @@ export type Action =
   | { type: "CLEAR_LAYER" }
   | { type: "SET_CIRCLE_MASK"; show: boolean }
   | { type: "TOGGLE_SECRET" }
-  | { type: "SET_BG_COL"; color: string };
+  | { type: "SET_BG_COL"; color: string; hue: number };
 
 export const initialState: State = {
+  secretHue: 100,
   drawHistory: [],
   stepCount: 0,
   maxStepCount: 0,
@@ -62,13 +64,12 @@ export function reducer(state: State, action: Action): State {
           brushSize: action.brushSize,
         },
       ];
-      const newStepCount = newHistory.length;
 
       const newState = {
         ...state,
         drawHistory: newHistory,
-        stepCount: newStepCount,
-        maxStepCount: newStepCount,
+        stepCount: state.stepCount + 1,
+        maxStepCount: state.stepCount + 1,
       };
       console.log(newState);
       return newState;
@@ -76,11 +77,10 @@ export function reducer(state: State, action: Action): State {
 
     case "UNDO": {
       if (state.stepCount <= 0) return state;
-      const newStepCount = state.stepCount - 1;
-      const last = state.drawHistory[newStepCount - 1];
+      const last = state.drawHistory[state.stepCount - 1];
       return {
         ...state,
-        stepCount: newStepCount,
+        stepCount: state.stepCount - 1,
         isLight: last?.isLight,
         bgCol: state.showSecret
           ? state.bgCol
@@ -92,11 +92,10 @@ export function reducer(state: State, action: Action): State {
 
     case "REDO": {
       if (state.stepCount >= state.maxStepCount) return state;
-      const newStepCount = state.stepCount + 1;
-      const last = state.drawHistory[newStepCount - 1];
+      const last = state.drawHistory[state.stepCount - 1];
       return {
         ...state,
-        stepCount: newStepCount,
+        stepCount: state.stepCount + 1,
         isLight: last?.isLight,
         bgCol: state.showSecret
           ? state.bgCol
@@ -112,14 +111,19 @@ export function reducer(state: State, action: Action): State {
         ...trimmed,
         { action: "switch" as const, isLight: action.isLight },
       ];
-      const newStepCount = newHistory.length;
       return {
         ...state,
         isLight: action.isLight,
-        bgCol: action.isLight ? COL_LIGHT : COL_DARK,
+        bgCol: state.showSecret
+          ? action.isLight
+            ? `hsl(${state.secretHue} 10% 70%)`
+            : `hsl(${state.secretHue} 10% 30%)`
+          : action.isLight
+            ? COL_LIGHT
+            : COL_DARK,
         drawHistory: newHistory,
-        stepCount: newStepCount,
-        maxStepCount: newStepCount,
+        stepCount: state.stepCount + 1,
+        maxStepCount: state.stepCount + 1,
       };
     }
 
@@ -154,7 +158,7 @@ export function reducer(state: State, action: Action): State {
       return { ...state, showSecret: !state.showSecret };
 
     case "SET_BG_COL":
-      return { ...state, bgCol: action.color };
+      return { ...state, bgCol: action.color, secretHue: action.hue };
 
     default:
       return state;

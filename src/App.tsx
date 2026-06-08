@@ -1,4 +1,4 @@
-import { useReducer, useRef } from "react";
+import { useReducer, useRef, useState } from "react";
 import Layer from "./components/layer";
 import type { LayerHandle } from "./components/layer";
 import Toolbar from "./components/toolbar";
@@ -14,6 +14,7 @@ const COL_LIGHT = "#FFFFFF";
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
+    secretHue,
     stepCount,
     maxStepCount,
     isEraser,
@@ -121,9 +122,17 @@ function App() {
 
   const handleShowSecret = (hue: number, isHover: boolean) => {
     if (isHover || showSecret) {
-      dispatch({ type: "SET_BG_COL", color: `hsl(${hue},10%,40%` });
+      dispatch({
+        type: "SET_BG_COL",
+        color: isLight ? `hsl(${hue},10%,80%` : `hsl(${hue},10%,40%`,
+        hue: hue,
+      });
     } else {
-      dispatch({ type: "SET_BG_COL", color: isLight ? COL_LIGHT : COL_DARK });
+      dispatch({
+        type: "SET_BG_COL",
+        color: isLight ? COL_LIGHT : COL_DARK,
+        hue: hue,
+      });
     }
   };
 
