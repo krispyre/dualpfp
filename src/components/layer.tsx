@@ -45,7 +45,8 @@ const Layer = ({
   function draw(isRefreshing: boolean, points: Point[]) {
     if (points.length < 2) return;
     const ctx = ctxRef.current;
-    if (!(ctx && isEnabled)) return;
+    if (!ctx) return;
+    if (!isRefreshing && !isEnabled) return;
     if (!(isRefreshing || isDrawing)) return;
 
     const drawPixel = (x: number, y: number) => {
@@ -105,6 +106,7 @@ const Layer = ({
             }
             ctx.lineWidth = step.brushSize!;
             draw(true, step.path!);
+            console.log(isLight ? "light" : "dark", "stroke", ctx.strokeStyle);
             break;
           case "switch":
             break;
@@ -190,7 +192,6 @@ const Layer = ({
     (e.target as HTMLCanvasElement).releasePointerCapture(e.pointerId); //wtf
     setIsDrawing(false);
     addDrawHist(isLight, curPath);
-    console.log("new stroke");
     const path = curPath;
     setCurPath([]);
     if (path.length > 1) ditherClear(isLight);

@@ -71,7 +71,6 @@ export function reducer(state: State, action: Action): State {
         stepCount: state.stepCount + 1,
         maxStepCount: state.stepCount + 1,
       };
-      console.log(newState);
       return newState;
     }
 
@@ -109,7 +108,8 @@ export function reducer(state: State, action: Action): State {
       const trimmed = state.drawHistory.slice(0, state.stepCount);
       const newHistory = [
         ...trimmed,
-        { action: "switch" as const, isLight: action.isLight },
+        { action: "switch" as const, isLight: !action.isLight },
+        // when switch from dark to light, store DARK for undo
       ];
       return {
         ...state,
