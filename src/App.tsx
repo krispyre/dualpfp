@@ -161,6 +161,8 @@ function App() {
         <CircleMask isEnabled={showCircleMask} length={LENGTH} />
       </section>
       <Toolbar
+        drawHistStep={state.stepCount}
+        maxDhStep={state.maxStepCount}
         isEraser={isEraser}
         brushSize={brushSize}
         eraserSize={eraserSize}

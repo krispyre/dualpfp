@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 type ToolbarProps = {
+  drawHistStep: number;
+  maxDhStep: number;
   isEraser: boolean;
   brushSize: number;
   eraserSize: number;
@@ -22,6 +24,8 @@ type ToolbarProps = {
 };
 
 const Toolbar = ({
+  drawHistStep,
+  maxDhStep,
   isEraser,
   brushSize,
   eraserSize,
@@ -84,116 +88,124 @@ const Toolbar = ({
   };
 
   return (
-    <>
-      <section className="tools">
-        <div>
-          <label htmlFor="isEraser">eraser?</label>
-          <input
-            type="checkbox"
-            name="isEraser"
-            id="isEraser"
-            checked={isEraser}
-            onChange={handleSetEraser}
-          />
-        </div>
-        <div id="undoStack">
-          <button name="undo" id="undo" onClick={handleUndo}>
-            undo
-          </button>
-          <button name="redo" id="redo" onClick={handleRedo}>
-            redo
-          </button>
-        </div>
-        <div id="brushSettings">
-          <label htmlFor="brushSize">brush size</label>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            id="brushSize"
-            name="brushSize"
-            value={brushSize}
-            onChange={handleSetBrushSize}
-          />
-          <label htmlFor="brushSize">{brushSize}</label>
-        </div>
-        <div id="eraserSettings">
-          <label htmlFor="eraserSize">eraser size</label>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            id="eraserSize"
-            name="eraserSize"
-            value={eraserSize}
-            onChange={handleSetEraserSize}
-          />
-          <label htmlFor="brushSize">{eraserSize}</label>
-        </div>
-        <div>
-          <label htmlFor="isLight">light mode?</label>
-          <input
-            type="checkbox"
-            name="isLight"
-            id="isLight"
-            checked={isLight}
-            onChange={handleSetLight}
-          />
-        </div>
-        <div>
-          <label htmlFor="showCircleMask">show circle mask?</label>
-          <input
-            type="checkbox"
-            name="showCircleMask"
-            id="showCircleMask"
-            checked={showCircleMask}
-            onChange={handleSetCircleMask}
-          />
-        </div>
+    <section className="tools">
+      <div>
+        <label htmlFor="isEraser">eraser?</label>
+        <input
+          type="checkbox"
+          name="isEraser"
+          id="isEraser"
+          checked={isEraser}
+          onChange={handleSetEraser}
+        />
+      </div>
+      <div id="undoStack">
         <button
-          name="clearLayerLight"
-          id="clearLayerLight"
-          onClick={handleClearLight}
+          name="undo"
+          id="undo"
+          onClick={handleUndo}
+          disabled={drawHistStep <= 0}
         >
-          clear light mode
+          undo
         </button>
         <button
-          name="clearLayerDark"
-          id="clearLayerDark"
-          onClick={handleClearDark}
+          name="redo"
+          id="redo"
+          onClick={handleRedo}
+          disabled={drawHistStep >= maxDhStep}
         >
-          clear dark mode
+          redo
         </button>
-        <br />
-        <button
-          onClick={onToggleSecret}
-          onPointerLeave={() => onShowSecret(0, false)}
-          onPointerMove={(e) => {
-            const hue = Math.round(
-              (e.nativeEvent.offsetX / (e.target as HTMLElement).clientWidth) *
-                255,
-            );
-            // console.log(hue);
-            onShowSecret(hue, true);
-          }}
-        >
-          {showSecret ? "regular bg" : "reveal secret"}
+      </div>
+      <div id="brushSettings">
+        <label htmlFor="brushSize">brush size</label>
+        <input
+          type="range"
+          min="1"
+          max="10"
+          id="brushSize"
+          name="brushSize"
+          value={brushSize}
+          onChange={handleSetBrushSize}
+        />
+        <label htmlFor="brushSize">{brushSize}</label>
+      </div>
+      <div id="eraserSettings">
+        <label htmlFor="eraserSize">eraser size</label>
+        <input
+          type="range"
+          min="1"
+          max="10"
+          id="eraserSize"
+          name="eraserSize"
+          value={eraserSize}
+          onChange={handleSetEraserSize}
+        />
+        <label htmlFor="brushSize">{eraserSize}</label>
+      </div>
+      <div>
+        <label htmlFor="isLight">light mode?</label>
+        <input
+          type="checkbox"
+          name="isLight"
+          id="isLight"
+          checked={isLight}
+          onChange={handleSetLight}
+        />
+      </div>
+      <div>
+        <label htmlFor="showCircleMask">show circle mask?</label>
+        <input
+          type="checkbox"
+          name="showCircleMask"
+          id="showCircleMask"
+          checked={showCircleMask}
+          onChange={handleSetCircleMask}
+        />
+      </div>
+      <button
+        name="clearLayerLight"
+        id="clearLayerLight"
+        onClick={handleClearLight}
+      >
+        clear light mode
+      </button>
+      <button
+        name="clearLayerDark"
+        id="clearLayerDark"
+        onClick={handleClearDark}
+      >
+        clear dark mode
+      </button>
+      <br />
+      <button
+        onClick={onToggleSecret}
+        onPointerLeave={() => onShowSecret(0, false)}
+        onPointerMove={(e) => {
+          const hue = Math.round(
+            (e.nativeEvent.offsetX / (e.target as HTMLElement).clientWidth) *
+              255,
+          );
+          // console.log(hue);
+          onShowSecret(hue, true);
+        }}
+      >
+        {showSecret ? "regular bg" : "reveal secret"}
+      </button>
+      <hr />
+      <div id="saveField">
+        <input
+          type="text"
+          placeholder="pfp"
+          id="filenameField"
+          value={filename}
+          onChange={(e) => setFilename(e.target.value)}
+        />
+        <button id="saveButton" onClick={() => handleSaveImg(filename)}>
+          save image
         </button>
-        <hr />
-        <div id="saveField">
-          <input
-            type="text"
-            placeholder="pfp"
-            id="filenameField"
-            value={filename}
-            onChange={(e) => setFilename(e.target.value)}
-          />
-          <button id="saveButton" onClick={() => handleSaveImg(filename)}>
-            save image
-          </button>
-        </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 
