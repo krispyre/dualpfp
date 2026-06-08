@@ -1,81 +1,45 @@
-/* tslint:disable:no-unused-variable */
-
-import { useState, useRef, useEffect } from "react";
+import { useReducer, useRef } from "react";
 import Layer from "./components/layer";
+import type { LayerHandle } from "./components/layer";
 import Toolbar from "./components/toolbar";
 import "./App.css";
 import CircleMask from "./components/circleMask";
-import type { DrawAction, Point } from "./components/drawAction";
+import { reducer, initialState } from "./reducer";
+import type { Point } from "./components/drawAction";
 
-const LENGTH = 80;
+const LENGTH = 256;
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
-const COL_RED = "hsl(353, 60%, 48%)";
 
 function App() {
-  const [isEraser, setIsEraser] = useState(false);
-  const [brushSize, setBrushSize] = useState(3);
-  const [eraserSize, setEraserSize] = useState(10);
-  const [isLight, setIsLight] = useState(false);
-  const [showCircleMask, setShowCircleMask] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { isEraser, brushSize, eraserSize, isLight, showCircleMask, showSecret, bgCol, drawHistory } = state;
 
-  const layerLight = useRef(null);
-  const layerDark = useRef(null);
-
-  const [shouldClearLight, setShouldClearLight] = useState(false);
-  const [shouldClearDark, setShouldClearDark] = useState(false);
-
-  const [showSecret, setShowSecret] = useState(false);
-  const [bgCol, setBgCol] = useState(COL_DARK);
-
-  const [drawHistory, setDrawHistory] = useState<DrawAction[]>([]);
-  const [shouldUndo, setShouldUndo] = useState(false);
-  const [drawStep, setDrawStep] = useState(0); //todo for redo
+  const layerDarkCanvas = useRef<HTMLCanvasElement>(null);
+  const layerLightCanvas = useRef<HTMLCanvasElement>(null);
+  const layerDarkRef = useRef<LayerHandle>(null);
+  const layerLightRef = useRef<LayerHandle>(null);
 
   const addDrawHist = (isLight: boolean, newPath: Point[]) => {
-    setDrawHistory((prev) => {
-      const size = isEraser ? eraserSize : brushSize;
-      const newHist = [
-        ...prev, // wtf is as const yo
-        {
-          action: "draw" as const,
-          path: newPath,
-          isLight: isLight,
-          isEraser,
-          brushSize: size,
-        },
-      ];
-      console.log("drawHist:", newHist);
-      // save a file for testing undo refresh
-      // if (newHist.length == 10) {
-      //   const jsonString = JSON.stringify(drawHistory, null, 2); // Pretty print
-      //   const blob = new Blob([jsonString], { type: "application/json" });
-      //   const url = URL.createObjectURL(blob);
-
-      //   const a = document.createElement("a");
-      //   a.href = url;
-      //   a.download = `draw-history-${Date.now()}.json`;
-      //   document.body.appendChild(a);
-      //   a.click();
-      //   document.body.removeChild(a);
-      //   URL.revokeObjectURL(url); // Cleanup
-      // }
-      return newHist;
+    dispatch({
+      type: "ADD_DRAW",
+      path: newPath,
+      isLight,
+      isEraser,
+      brushSize: isEraser ? eraserSize : brushSize,
     });
   };
 
-  const handleSetEraser = (e) => {
-    setIsEraser(e);
+  const handleSetEraser = (val: boolean) => {
+    dispatch({ type: "SET_ERASER", isEraser: val });
+    layerDarkRef.current?.setEraser(val);
+    layerLightRef.current?.setEraser(val);
   };
 
   const handleUndo = () => {
-    setDrawHistory((prev) => prev.slice(0, -1));
-    setShouldUndo(() => {
-      return true;
-    });
-    //if undoed switch, change the bg col too
-
-    console.log("Undo action");
+    dispatch({ type: "UNDO" });
+    const activeRef = isLight ? layerLightRef : layerDarkRef;
+    activeRef.current?.undo();
   };
 
   const handleRedo = () => {
@@ -83,54 +47,41 @@ function App() {
   };
 
   const handleSetBrushSize = (size: number) => {
-    setBrushSize(size);
+    dispatch({ type: "SET_BRUSH_SIZE", size });
+    layerDarkRef.current?.setBrushSize(size);
+    layerLightRef.current?.setBrushSize(size);
   };
 
   const handleSetEraserSize = (size: number) => {
-    setEraserSize(size);
+    dispatch({ type: "SET_ERASER_SIZE", size });
   };
 
   const handleSetLight = (mode: boolean) => {
-    if (!showSecret) {
-      if (mode) {
-        setBgCol(COL_LIGHT);
-      } else {
-        setBgCol(COL_DARK);
-      }
-    }
-    setIsLight(mode);
-    setDrawHistory((prev) => {
-      const newHist = [
-        ...prev,
-        { action: "switch" as const, isLight: mode, isEraser },
-      ];
-      console.log("drawHist:", newHist);
-      return newHist;
-    });
+    dispatch({ type: "SWITCH_LAYER", isLight: mode });
   };
 
   const handleSetCircleMask = (show: boolean) => {
-    setShowCircleMask(show);
+    dispatch({ type: "SET_CIRCLE_MASK", show });
   };
 
   const handleClearLight = () => {
-    setShouldClearLight(true);
-    setDrawHistory((prev) => [...prev, { action: "clear", isLight }]);
+    dispatch({ type: "CLEAR_LAYER" });
+    layerLightRef.current?.clear();
   };
 
   const handleClearDark = () => {
-    setShouldClearDark(true);
-    setDrawHistory((prev) => [...prev, { action: "clear", isLight }]);
+    dispatch({ type: "CLEAR_LAYER" });
+    layerDarkRef.current?.clear();
   };
 
   const handleSaveImg = (filename: string) => {
-    const dark: HTMLCanvasElement = layerDark.current;
-    const light: HTMLCanvasElement = layerLight.current;
+    const dark: HTMLCanvasElement = layerDarkCanvas.current!;
+    const light: HTMLCanvasElement = layerLightCanvas.current!;
 
     const exportCanvas = document.createElement("canvas");
     exportCanvas.width = LENGTH;
     exportCanvas.height = LENGTH;
-    const exportCtx = exportCanvas.getContext("2d");
+    const exportCtx = exportCanvas.getContext("2d")!;
     exportCtx.globalCompositeOperation = "source-over";
     exportCtx.drawImage(light, 0, 0);
     exportCtx.drawImage(dark, 0, 0);
@@ -139,49 +90,19 @@ function App() {
     exportLink.download = filename;
     exportLink.href = exportCanvas.toDataURL("image/png");
     window.open(exportLink.href, "_blank");
-
-    console.log(dark, "Save image");
   };
 
   const handleToggleSecret = () => {
-    setShowSecret((prev) => {
-      console.log("showsecret:", !prev);
-      return !prev;
-    });
+    dispatch({ type: "TOGGLE_SECRET" });
   };
 
-  // todo too vague, when is it even called
   const handleShowSecret = (hue: number, isHover: boolean) => {
-    // noShow => (set) pointerEnter => (set) click => (set) yesShow => (set) pointerLeave => (set) still yesShow
-    // (set) yesShow => (set) pointerEnter => (TURN OFF) click => noShow => pointerLeave => still noShow
-
     if (isHover || showSecret) {
-      setBgCol(`hsl(${hue},10%,40%`);
+      dispatch({ type: "SET_BG_COL", color: `hsl(${hue},10%,40%` });
     } else {
-      if (isLight) {
-        setBgCol(COL_LIGHT);
-      } else {
-        setBgCol(COL_DARK);
-      }
+      dispatch({ type: "SET_BG_COL", color: isLight ? COL_LIGHT : COL_DARK });
     }
   };
-
-  useEffect(() => {
-    // i just moved this from handleSetLight idk man optimize this with reducer probably idk
-    //if undoed switch, switch mode back to lastest mode too
-    if (drawHistory.length >= 1) {
-      const mode = drawHistory.at(-1).isLight;
-
-      if (!showSecret) {
-        if (mode) {
-          setBgCol(COL_LIGHT);
-        } else {
-          setBgCol(COL_DARK);
-        }
-      }
-      setIsLight(mode);
-    }
-  }, [drawHistory]);
 
   return (
     <>
@@ -192,31 +113,25 @@ function App() {
         }}
       >
         <Layer
+          ref={layerDarkRef}
           drawHistory={drawHistory}
-          canvasRef={layerDark}
+          canvasRef={layerDarkCanvas}
           isLight={false}
           length={LENGTH}
           isEnabled={!isLight}
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
-          shouldClear={shouldClearDark}
-          shouldUndo={shouldUndo}
-          onClear={() => setShouldClearDark(false)}
-          onUndo={() => setShouldUndo(false)}
           addDrawHist={addDrawHist}
         />
         <Layer
+          ref={layerLightRef}
           drawHistory={drawHistory}
-          canvasRef={layerLight}
+          canvasRef={layerLightCanvas}
           isLight={true}
           length={LENGTH}
           isEnabled={isLight}
           brushSize={isEraser ? eraserSize : brushSize}
           isErase={isEraser}
-          shouldClear={shouldClearLight}
-          shouldUndo={shouldUndo}
-          onClear={() => setShouldClearLight(false)}
-          onUndo={() => setShouldUndo(false)}
           addDrawHist={addDrawHist}
         />
         <canvas id="ui" className="layer" width={LENGTH}></canvas>
