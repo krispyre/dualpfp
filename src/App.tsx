@@ -13,7 +13,18 @@ const COL_LIGHT = "#FFFFFF";
 
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { isEraser, brushSize, eraserSize, isLight, showCircleMask, showSecret, bgCol, drawHistory } = state;
+  const {
+    stepCount,
+    maxStepCount,
+    isEraser,
+    brushSize,
+    eraserSize,
+    isLight,
+    showCircleMask,
+    showSecret,
+    bgCol,
+    drawHistory,
+  } = state;
 
   const layerDarkCanvas = useRef<HTMLCanvasElement>(null);
   const layerLightCanvas = useRef<HTMLCanvasElement>(null);
@@ -37,13 +48,25 @@ function App() {
   };
 
   const handleUndo = () => {
+    if (state.stepCount <= 0) {
+      console.error("stepCount too low");
+      return;
+    }
+    const newStepCount = state.stepCount - 1;
     dispatch({ type: "UNDO" });
-    const activeRef = isLight ? layerLightRef : layerDarkRef;
-    activeRef.current?.undo();
+    layerDarkRef.current?.undo(newStepCount);
+    layerLightRef.current?.undo(newStepCount);
   };
 
   const handleRedo = () => {
-    console.log("Redo action");
+    if (state.stepCount >= state.maxStepCount) {
+      console.warn("most recent history reached");
+      return;
+    }
+    const newStepCount = state.stepCount + 1;
+    dispatch({ type: "REDO" });
+    layerDarkRef.current?.redo(newStepCount);
+    layerLightRef.current?.redo(newStepCount);
   };
 
   const handleSetBrushSize = (size: number) => {

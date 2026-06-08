@@ -5,7 +5,9 @@ const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
 
 export type LayerHandle = {
-  undo: () => void;
+  undo: (stepCount: number) => void;
+  redo: (stepCount: number) => void;
+
   clear: () => void;
   setEraser: (erase: boolean) => void;
   setBrushSize: (size: number) => void;
@@ -75,14 +77,17 @@ const Layer = ({
     }
   }
 
-  function refresh(customData = null) {
+  function refresh(stepCount, customData = null) {
     if (!canvasRef || !ctxRef.current) return;
     const ctx: CanvasRenderingContext2D = ctxRef.current;
-    const steps = customData || drawHistory;
+    const steps = customData ?? drawHistory;
 
     clearLayer();
 
-    for (const step of steps) {
+    for (const i in steps) {
+      // repeat until history exhausted OR repeated stepCount times
+      const step = steps[i];
+      if (i >= stepCount) return;
       if (step.isLight == isLight) {
         switch (step.action) {
           case "clear":
@@ -148,10 +153,15 @@ const Layer = ({
   useImperativeHandle(
     ref,
     () => ({
-      undo() {
-        refresh();
+      undo(stepCount) {
+        refresh(stepCount);
         ditherClear(isLight);
       },
+      redo(stepCount) {
+        refresh(stepCount);
+        ditherClear(isLight);
+      },
+
       clear() {
         clearLayer();
         ditherClear(isLight);
@@ -179,6 +189,7 @@ const Layer = ({
   const handlePointerUp = (e) => {
     setIsDrawing(false);
     addDrawHist(isLight, curPath);
+    console.log("new stroke");
     const path = curPath;
     setCurPath([]);
     if (path.length > 1) ditherClear(isLight);
