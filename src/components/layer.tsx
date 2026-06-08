@@ -187,6 +187,7 @@ const Layer = ({
   );
 
   const handlePointerUp = (e) => {
+    (e.target as HTMLCanvasElement).releasePointerCapture(e.pointerId); //wtf
     setIsDrawing(false);
     addDrawHist(isLight, curPath);
     console.log("new stroke");
@@ -196,6 +197,7 @@ const Layer = ({
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId); //wtf
     setIsDrawing(true);
     const x = (e.nativeEvent.offsetX / actualLength) * length;
     const y = (e.nativeEvent.offsetY / actualLength) * length;
