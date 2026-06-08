@@ -81,7 +81,7 @@ export function reducer(state: State, action: Action): State {
       return {
         ...state,
         stepCount: newStepCount,
-        isLight: last?.isLight ?? state.isLight,
+        isLight: last?.isLight,
         bgCol: state.showSecret
           ? state.bgCol
           : last?.isLight
@@ -97,7 +97,7 @@ export function reducer(state: State, action: Action): State {
       return {
         ...state,
         stepCount: newStepCount,
-        isLight: last?.isLight ?? state.isLight,
+        isLight: last?.isLight,
         bgCol: state.showSecret
           ? state.bgCol
           : last?.isLight
