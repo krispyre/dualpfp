@@ -6,6 +6,7 @@ import CircleMask from "./components/circleMask";
 import { reducer, initialState } from "./reducer";
 import type { Action } from "./reducer";
 import type { Point } from "./components/drawAction";
+import { Redo2, Save, Undo2 } from "lucide-react";
 
 const LENGTH = 80;
 const COL_DARK = "#313338";
@@ -158,7 +159,9 @@ function App() {
     const exportLink = document.createElement("a");
     exportLink.download = filename;
     exportLink.href = exportCanvas.toDataURL("image/png");
-    window.open(exportLink.href, "_blank");
+    // window.open(exportLink.href, "_blank");
+
+    exportLink.click();
   };
 
   const handleToggleSecret = () => {
@@ -215,22 +218,27 @@ function App() {
         <CircleMask isEnabled={showCircleMask} length={LENGTH} />
       </section>
       <section id="undoStack">
-        <button
-          name="undo"
-          id="undo"
-          onClick={handleUndo}
-          disabled={stepCount <= 0}
-        >
-          undo
-        </button>
-        <button
-          name="redo"
-          id="redo"
-          onClick={handleRedo}
-          disabled={stepCount >= maxStepCount}
-        >
-          redo
-        </button>
+        <div id="undosWrap">
+          <button
+            aria-label="undo"
+            name="undo"
+            id="undo"
+            onClick={handleUndo}
+            disabled={stepCount <= 0}
+          >
+            <Undo2 />
+          </button>
+          <hr />
+          <button
+            aria-label="redo"
+            name="redo"
+            id="redo"
+            onClick={handleRedo}
+            disabled={stepCount >= maxStepCount}
+          >
+            <Redo2 />
+          </button>
+        </div>
       </section>
       <section id="brushSettings">
         <div id="brushSlider" style={{ display: isEraser ? "none" : "block" }}>
@@ -324,15 +332,19 @@ function App() {
           />
         </div>
         <div id="saveField">
-          <input
+          {/* <input
             type="text"
             placeholder="pfp"
             id="filenameField"
             value={filename}
             onChange={(e) => setFilename(e.target.value)}
-          />
-          <button id="saveButton" onClick={() => handleSaveImg(filename)}>
-            save image
+          /> */}
+          <button
+            id="saveButton"
+            onClick={() => handleSaveImg(filename)}
+            aria-label="save image"
+          >
+            <Save />
           </button>
         </div>
       </section>

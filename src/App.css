@@ -81,6 +81,17 @@
     -webkit-touch-callout: none;
   }
 }
+#undosWrap {
+  background-color: #0000007a;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8%;
+  padding: 0.6em;
+  button {
+    border-radius: 4%;
+    padding: 0;
+  }
+}
 button {
   border-radius: 8px;
   border: 1px solid transparent;
