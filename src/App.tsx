@@ -214,7 +214,7 @@ function App() {
         <canvas id="ui" className="layer" width={LENGTH}></canvas>
         <CircleMask isEnabled={showCircleMask} length={LENGTH} />
       </section>
-      <div id="undoStack">
+      <section id="undoStack">
         <button
           name="undo"
           id="undo"
@@ -231,9 +231,9 @@ function App() {
         >
           redo
         </button>
-      </div>
-      <div id="brushSettings">
-        <div id="brushSlider">
+      </section>
+      <section id="brushSettings">
+        <div id="brushSlider" style={{ display: isEraser ? "none" : "block" }}>
           <label htmlFor="brushSize">brush size</label>
           <input
             type="range"
@@ -246,7 +246,7 @@ function App() {
           />
           <label htmlFor="brushSize">{brushSize}</label>
         </div>
-        <div id="eraserSlider">
+        <div id="eraserSlider" style={{ display: isEraser ? "block" : "none" }}>
           <label htmlFor="eraserSize">eraser size</label>
           <input
             type="range"
@@ -270,6 +270,7 @@ function App() {
           />
         </div>
         <button
+          id="revealSecret"
           onClick={handleToggleSecret}
           onPointerLeave={() => handleShowSecret(0, false)}
           onPointerMove={(e) => {
@@ -282,12 +283,13 @@ function App() {
         >
           {showSecret ? "regular bg" : "reveal secret"}
         </button>
-      </div>
-      <div id="clearBtns">
+      </section>
+      <section id="clearBtns">
         <button
           name="clearLayerLight"
           id="clearLayerLight"
           onClick={handleClearLight}
+          style={{ display: isLight ? "block" : "none" }}
         >
           clear light mode
         </button>
@@ -295,12 +297,13 @@ function App() {
           name="clearLayerDark"
           id="clearLayerDark"
           onClick={handleClearDark}
+          style={{ display: isLight ? "none" : "block" }}
         >
           clear dark mode
         </button>
-      </div>
-      <div id="displayToggles">
-        <div>
+      </section>
+      <section id="displayToggles">
+        <div id="lightToggle">
           <label htmlFor="isLight">light mode?</label>
           <input
             type="checkbox"
@@ -310,7 +313,7 @@ function App() {
             onChange={(e) => handleSetLight(e.target.checked)}
           />
         </div>
-        <div>
+        <div id="circleToggle">
           <label htmlFor="showCircleMask">show circle mask?</label>
           <input
             type="checkbox"
@@ -332,7 +335,7 @@ function App() {
             save image
           </button>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

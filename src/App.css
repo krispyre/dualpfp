@@ -14,45 +14,49 @@
   flex-direction: column;
 }
 
+/* grid layout */
 #gridWrap {
+  margin: auto;
   display: grid;
+  gap: 1em;
   grid-template-areas:
-    ". clear ."
-    "undo canvas toggles"
-    ". sliders .";
+    ". a ."
+    "b c d"
+    ". e .";
 
   #clearBtns {
-    grid-area: clear;
+    grid-area: a;
   }
   #undoStack {
-    grid-area: undo;
+    grid-area: b;
   }
   #canvasContainer {
-    grid-area: canvas;
+    grid-area: c;
   }
   #displayToggles {
-    grid-area: toggles;
+    grid-area: d;
   }
   #brushSettings {
-    grid-area: sliders;
+    grid-area: e;
+    display: grid;
+    gap: 0.5em;
+    grid-template-areas:
+      "- b"
+      "- b"
+      "o o";
+    #eraserToggle {
+      grid-area: b;
+    }
+    #revealSecret {
+      grid-area: o;
+    }
+  }
+  > section {
+    display: flex;
+    flex-direction: column;
   }
 }
 
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  image-rendering: pixelated;
-  width: 100%;
-  min-width: 100px;
-  min-height: 100px;
-  aspect-ratio: 1;
-
-  touch-action: none;
-
-  user-select: none;
-  -webkit-touch-callout: none;
-}
 #canvasContainer {
   position: relative;
   border: 2px gray solid;
@@ -60,11 +64,22 @@ canvas {
   min-width: 100px;
   min-height: 100px;
   aspect-ratio: 1;
-}
-.tools {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    image-rendering: pixelated;
+    width: 100%;
+    min-width: 100px;
+    min-height: 100px;
+    aspect-ratio: 1;
+
+    touch-action: none;
+
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
 }
 button {
   border-radius: 8px;
