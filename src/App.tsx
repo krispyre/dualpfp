@@ -6,7 +6,21 @@ import CircleMask from "./components/circleMask";
 import { reducer, initialState } from "./reducer";
 import type { Action } from "./reducer";
 import type { Point } from "./components/drawAction";
-import { Redo2, Save, Undo2 } from "lucide-react";
+import {
+  Circle,
+  CircleOff,
+  Eraser,
+  Lightbulb,
+  LightbulbOff,
+  Pen,
+  Redo2,
+  Save,
+  Undo2,
+  UserCircle,
+  UserCircle2,
+  UserCircle2Icon,
+  UserRound,
+} from "lucide-react";
 
 const LENGTH = 80;
 const COL_DARK = "#313338";
@@ -218,13 +232,14 @@ function App() {
         <CircleMask isEnabled={showCircleMask} length={LENGTH} />
       </section>
       <section id="undoStack">
-        <div id="undosWrap">
+        <div id="undosWrap" className="btnGroup col">
           <button
             aria-label="undo"
             name="undo"
             id="undo"
             onClick={handleUndo}
             disabled={stepCount <= 0}
+            title="unpee pants"
           >
             <Undo2 />
           </button>
@@ -235,6 +250,7 @@ function App() {
             id="redo"
             onClick={handleRedo}
             disabled={stepCount >= maxStepCount}
+            title="repee pants"
           >
             <Redo2 />
           </button>
@@ -242,7 +258,7 @@ function App() {
       </section>
       <section id="brushSettings">
         <div id="brushSlider" style={{ display: isEraser ? "none" : "block" }}>
-          <label htmlFor="brushSize">brush size</label>
+          {/* <label htmlFor="brushSize">brush size</label> */}
           <input
             type="range"
             min="1"
@@ -252,10 +268,10 @@ function App() {
             value={brushSize}
             onChange={(e) => handleSetBrushSize(Number(e.target.value))}
           />
-          <label htmlFor="brushSize">{brushSize}</label>
+          <label className="brushSizeDisplay">{brushSize}</label>
         </div>
         <div id="eraserSlider" style={{ display: isEraser ? "block" : "none" }}>
-          <label htmlFor="eraserSize">eraser size</label>
+          {/* <label htmlFor="eraserSize">eraser size</label> */}
           <input
             type="range"
             min="1"
@@ -265,17 +281,26 @@ function App() {
             value={eraserSize}
             onChange={(e) => handleSetEraserSize(Number(e.target.value))}
           />
-          <label htmlFor="brushSize">{eraserSize}</label>
+          <label className="brushSizeDisplay">{eraserSize}</label>
         </div>
         <div id="eraserToggle">
-          <label htmlFor="isEraser">eraser?</label>
-          <input
-            type="checkbox"
-            name="isEraser"
-            id="isEraser"
-            checked={isEraser}
-            onChange={(e) => handleSetEraser(e.target.checked)}
-          />
+          {/* <label htmlFor="isEraser">eraser?</label> */}
+          <div className="btnGroup row">
+            <button
+              id="setEraser"
+              onClick={() => handleSetEraser(true)}
+              disabled={isEraser}
+            >
+              <Eraser />
+            </button>
+            <button
+              id="setPen"
+              onClick={() => handleSetEraser(false)}
+              disabled={!isEraser}
+            >
+              <Pen />
+            </button>
+          </div>
         </div>
         <button
           id="revealSecret"
@@ -293,43 +318,45 @@ function App() {
         </button>
       </section>
       <section id="clearBtns">
-        <button
-          name="clearLayerLight"
-          id="clearLayerLight"
-          onClick={handleClearLight}
-          style={{ display: isLight ? "block" : "none" }}
-        >
-          clear light mode
-        </button>
-        <button
-          name="clearLayerDark"
-          id="clearLayerDark"
-          onClick={handleClearDark}
-          style={{ display: isLight ? "none" : "block" }}
-        >
-          clear dark mode
-        </button>
+        <div id="clearBtnsWrap">
+          <button
+            name="clearLayerLight"
+            id="clearLayerLight"
+            onClick={handleClearLight}
+            style={{ display: isLight ? "block" : "none" }}
+          >
+            clear light mode
+          </button>
+          <button
+            name="clearLayerDark"
+            id="clearLayerDark"
+            onClick={handleClearDark}
+            style={{ display: isLight ? "none" : "block" }}
+          >
+            clear dark mode
+          </button>
+        </div>
       </section>
       <section id="displayToggles">
         <div id="lightToggle">
-          <label htmlFor="isLight">light mode?</label>
-          <input
-            type="checkbox"
-            name="isLight"
+          {/* <label htmlFor="isLight">light mode?</label> */}
+          <button
             id="isLight"
-            checked={isLight}
-            onChange={(e) => handleSetLight(e.target.checked)}
-          />
+            onClick={() => handleSetLight(!isLight)}
+            title="switch to another mode"
+          >
+            {isLight ? <LightbulbOff /> : <Lightbulb />}
+          </button>
         </div>
         <div id="circleToggle">
-          <label htmlFor="showCircleMask">show circle mask?</label>
-          <input
-            type="checkbox"
-            name="showCircleMask"
+          {/* <label htmlFor="showCircleMask">show circle mask?</label> */}
+          <button
             id="showCircleMask"
-            checked={showCircleMask}
-            onChange={(e) => handleSetCircleMask(e.target.checked)}
-          />
+            onClick={() => handleSetCircleMask(!showCircleMask)}
+            title="see pfp border"
+          >
+            {showCircleMask ? <UserRound /> : <UserCircle2 />}
+          </button>
         </div>
         <div id="saveField">
           {/* <input
@@ -342,7 +369,7 @@ function App() {
           <button
             id="saveButton"
             onClick={() => handleSaveImg(filename)}
-            aria-label="save image"
+            title="save image"
           >
             <Save />
           </button>
