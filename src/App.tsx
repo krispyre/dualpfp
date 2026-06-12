@@ -8,7 +8,7 @@ import { reducer, initialState } from "./reducer";
 import type { Action } from "./reducer";
 import type { Point } from "./components/drawAction";
 
-const LENGTH = 256;
+const LENGTH = 80;
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
 

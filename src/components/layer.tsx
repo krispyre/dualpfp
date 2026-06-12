@@ -83,6 +83,7 @@ const Layer = ({
     const ctx: CanvasRenderingContext2D = ctxRef.current;
     const steps = customData ?? drawHistory;
 
+    const userBrushSize = brushSize;
     clearLayer();
 
     for (const i in steps) {
@@ -104,9 +105,9 @@ const Layer = ({
               ctx.fillStyle = brush_col;
               ctx.globalCompositeOperation = "source-over";
             }
-            ctx.lineWidth = step.brushSize!;
+            brushSize = step.brushSize!;
             draw(true, step.path!);
-            console.log(isLight ? "light" : "dark", "stroke", ctx.strokeStyle);
+
             break;
           case "switch":
             break;
@@ -115,7 +116,8 @@ const Layer = ({
       ditherClear(isLight);
     }
 
-    ctx.lineWidth = brushSize;
+    brushSize = userBrushSize;
+
     if (isErase) {
       ctx.strokeStyle = "rgba(0,0,0,1)";
       ctx.fillStyle = "rgba(0,0,0,1)";
@@ -157,6 +159,7 @@ const Layer = ({
     ref,
     () => ({
       updateByStep(stepCount) {
+        console.warn("update bysetp");
         refresh(stepCount);
       },
       loadHistory(stepCount, hist) {
@@ -228,7 +231,7 @@ const Layer = ({
     setCurPath([]);
   };
 
-  //init
+  //init: brush stroke is unused bc i use fillrect to draw dots bc stroke uses antialiasing and its gross
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -238,7 +241,6 @@ const Layer = ({
     ctx.imageSmoothingEnabled = false;
     ctx.lineJoin = "round";
     ctx.lineCap = "butt";
-    ctx.lineWidth = brushSize;
     ctx.strokeStyle = brush_col;
     ctx.fillStyle = brush_col;
   }, []);
@@ -247,7 +249,6 @@ const Layer = ({
   useEffect(() => {
     const ctx = ctxRef.current;
     if (!ctx) return;
-    ctx.lineWidth = brushSize;
     if (isErase) {
       ctx.strokeStyle = "rgba(0,0,0,1)";
       ctx.fillStyle = "rgba(0,0,0,1)";
