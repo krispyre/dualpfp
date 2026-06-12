@@ -14,6 +14,30 @@
   flex-direction: column;
 }
 
+#gridWrap {
+  display: grid;
+  grid-template-areas:
+    ". clear ."
+    "undo canvas toggles"
+    ". sliders .";
+
+  #clearBtns {
+    grid-area: clear;
+  }
+  #undoStack {
+    grid-area: undo;
+  }
+  #canvasContainer {
+    grid-area: canvas;
+  }
+  #displayToggles {
+    grid-area: toggles;
+  }
+  #brushSettings {
+    grid-area: sliders;
+  }
+}
+
 canvas {
   position: absolute;
   top: 0;

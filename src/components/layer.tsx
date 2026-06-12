@@ -159,7 +159,6 @@ const Layer = ({
     ref,
     () => ({
       updateByStep(stepCount) {
-        console.warn("update bysetp");
         refresh(stepCount);
       },
       loadHistory(stepCount, hist) {
