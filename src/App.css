@@ -1,5 +1,5 @@
 :root {
-  --cDisplayLength: 60vh;
+  --cDisplayLength: 30vh;
   background-color: #242424;
 }
 
@@ -19,7 +19,7 @@ canvas {
   top: 0;
   left: 0;
   image-rendering: pixelated;
-  width: var(--cDisplayLength);
+  width: 100%;
   min-width: 100px;
   min-height: 100px;
   aspect-ratio: 1;
@@ -61,6 +61,9 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+hr {
+  width: 100%;
+}
 @media (prefers-reduced-motion: no-preference) {
   button {
     transition: all 0;
