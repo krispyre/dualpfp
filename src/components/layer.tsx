@@ -5,8 +5,8 @@ const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
 
 export type LayerHandle = {
-  undo: (stepCount: number) => void;
-  redo: (stepCount: number) => void;
+  updateByStep: (stepCount: number) => void;
+  loadHistory: (stepCount: number, hist: DrawAction[]) => void;
 
   clear: () => void;
   setEraser: (erase: boolean) => void;
@@ -152,16 +152,15 @@ const Layer = ({
     ctx.clearRect(0, 0, length, length);
   }
 
+  // child methods
   useImperativeHandle(
     ref,
     () => ({
-      undo(stepCount) {
+      updateByStep(stepCount) {
         refresh(stepCount);
-        ditherClear(isLight);
       },
-      redo(stepCount) {
-        refresh(stepCount);
-        ditherClear(isLight);
+      loadHistory(stepCount, hist) {
+        refresh(stepCount, hist);
       },
 
       clear() {

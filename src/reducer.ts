@@ -25,8 +25,14 @@ export type Action =
       isEraser: boolean;
       brushSize: number;
     }
-  | { type: "UNDO" }
-  | { type: "REDO" }
+  | { type: "UNDO"; stepCount: number }
+  | { type: "REDO"; stepCount: number }
+  | {
+      type: "LOAD_HIST";
+      drawHistory: DrawAction[];
+      stepCount: number;
+      maxStepCount: number;
+    }
   | { type: "SWITCH_LAYER"; isLight: boolean }
   | { type: "SET_ERASER"; isEraser: boolean }
   | { type: "SET_BRUSH_SIZE"; size: number }
@@ -101,6 +107,15 @@ export function reducer(state: State, action: Action): State {
           : last?.isLight
             ? COL_LIGHT
             : COL_DARK,
+      };
+    }
+
+    case "LOAD_HIST": {
+      return {
+        ...state,
+        stepCount: action.stepCount,
+        maxStepCount: action.maxStepCount,
+        drawHistory: action.drawHistory,
       };
     }
 

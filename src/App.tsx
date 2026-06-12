@@ -1,10 +1,11 @@
-import { useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import Layer from "./components/layer";
 import type { LayerHandle } from "./components/layer";
 import Toolbar from "./components/toolbar";
 import "./App.css";
 import CircleMask from "./components/circleMask";
 import { reducer, initialState } from "./reducer";
+import type { Action } from "./reducer";
 import type { Point } from "./components/drawAction";
 
 const LENGTH = 256;
@@ -13,6 +14,8 @@ const COL_LIGHT = "#FFFFFF";
 
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
+  //most recent draw action
+  const lastHistoryAction = useRef<Action["type"] | null>(null);
   const {
     secretHue,
     stepCount,
@@ -27,13 +30,53 @@ function App() {
     drawHistory,
   } = state;
 
+  useEffect(() => {
+    const storedHistory = localStorage.getItem("drawHistory");
+    const storedStepCount = localStorage.getItem("stepCount");
+    if (storedHistory && storedStepCount) {
+      const hist = JSON.parse(storedHistory);
+      const sc = JSON.parse(storedStepCount);
+      dispatch({
+        type: "LOAD_HIST",
+        drawHistory: hist,
+        stepCount: sc,
+        maxStepCount: hist.length,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (drawHistory.length > 0) {
+      layerDarkRef.current?.loadHistory(stepCount, drawHistory);
+      layerLightRef.current?.loadHistory(stepCount, drawHistory);
+    }
+  }, [drawHistory, stepCount]);
+
+  useEffect(() => {
+    if (
+      lastHistoryAction.current === "ADD_DRAW" ||
+      lastHistoryAction.current === "UNDO" ||
+      lastHistoryAction.current === "REDO" ||
+      lastHistoryAction.current === "LOAD_HIST"
+    ) {
+      localStorage.setItem("drawHistory", JSON.stringify(drawHistory));
+      localStorage.setItem("stepCount", JSON.stringify(stepCount));
+    }
+  }, [drawHistory, stepCount]);
+
+  // track last draw action then dispatch
+  const trackedDispatch = (action: Action) => {
+    lastHistoryAction.current = action.type;
+    dispatch(action);
+  };
+
   const layerDarkCanvas = useRef<HTMLCanvasElement>(null);
   const layerLightCanvas = useRef<HTMLCanvasElement>(null);
   const layerDarkRef = useRef<LayerHandle>(null);
   const layerLightRef = useRef<LayerHandle>(null);
 
   const addDrawHist = (isLight: boolean, newPath: Point[]) => {
-    dispatch({
+    trackedDispatch({
       type: "ADD_DRAW",
       path: newPath,
       isLight,
@@ -42,8 +85,9 @@ function App() {
     });
   };
 
+  // button handlers
   const handleSetEraser = (val: boolean) => {
-    dispatch({ type: "SET_ERASER", isEraser: val });
+    trackedDispatch({ type: "SET_ERASER", isEraser: val });
     layerDarkRef.current?.setEraser(val);
     layerLightRef.current?.setEraser(val);
   };
@@ -54,9 +98,9 @@ function App() {
       return;
     }
     const newStepCount = state.stepCount - 1;
-    dispatch({ type: "UNDO" });
-    layerDarkRef.current?.undo(newStepCount);
-    layerLightRef.current?.undo(newStepCount);
+    trackedDispatch({ type: "UNDO", stepCount: newStepCount });
+    layerDarkRef.current?.updateByStep(newStepCount);
+    layerLightRef.current?.updateByStep(newStepCount);
   };
 
   const handleRedo = () => {
@@ -65,36 +109,36 @@ function App() {
       return;
     }
     const newStepCount = state.stepCount + 1;
-    dispatch({ type: "REDO" });
-    layerDarkRef.current?.redo(newStepCount);
-    layerLightRef.current?.redo(newStepCount);
+    trackedDispatch({ type: "REDO", stepCount: newStepCount });
+    layerDarkRef.current?.updateByStep(newStepCount);
+    layerLightRef.current?.updateByStep(newStepCount);
   };
 
   const handleSetBrushSize = (size: number) => {
-    dispatch({ type: "SET_BRUSH_SIZE", size });
+    trackedDispatch({ type: "SET_BRUSH_SIZE", size });
     layerDarkRef.current?.setBrushSize(size);
     layerLightRef.current?.setBrushSize(size);
   };
 
   const handleSetEraserSize = (size: number) => {
-    dispatch({ type: "SET_ERASER_SIZE", size });
+    trackedDispatch({ type: "SET_ERASER_SIZE", size });
   };
 
   const handleSetLight = (mode: boolean) => {
-    dispatch({ type: "SWITCH_LAYER", isLight: mode });
+    trackedDispatch({ type: "SWITCH_LAYER", isLight: mode });
   };
 
   const handleSetCircleMask = (show: boolean) => {
-    dispatch({ type: "SET_CIRCLE_MASK", show });
+    trackedDispatch({ type: "SET_CIRCLE_MASK", show });
   };
 
   const handleClearLight = () => {
-    dispatch({ type: "CLEAR_LAYER" });
+    trackedDispatch({ type: "CLEAR_LAYER" });
     layerLightRef.current?.clear();
   };
 
   const handleClearDark = () => {
-    dispatch({ type: "CLEAR_LAYER" });
+    trackedDispatch({ type: "CLEAR_LAYER" });
     layerDarkRef.current?.clear();
   };
 
@@ -117,18 +161,18 @@ function App() {
   };
 
   const handleToggleSecret = () => {
-    dispatch({ type: "TOGGLE_SECRET" });
+    trackedDispatch({ type: "TOGGLE_SECRET" });
   };
 
   const handleShowSecret = (hue: number, isHover: boolean) => {
     if (isHover || showSecret) {
-      dispatch({
+      trackedDispatch({
         type: "SET_BG_COL",
         color: isLight ? `hsl(${hue},10%,80%` : `hsl(${hue},10%,40%`,
         hue: hue,
       });
     } else {
-      dispatch({
+      trackedDispatch({
         type: "SET_BG_COL",
         color: isLight ? COL_LIGHT : COL_DARK,
         hue: hue,
