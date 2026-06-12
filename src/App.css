@@ -137,6 +137,7 @@
 #revealSecret {
   background-color: #0000003f;
   color: #ffffff3f;
+  cursor: col-resize;
 }
 button {
   border-radius: 8px;
