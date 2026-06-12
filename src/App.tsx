@@ -1,7 +1,6 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import Layer from "./components/layer";
 import type { LayerHandle } from "./components/layer";
-import Toolbar from "./components/toolbar";
 import "./App.css";
 import CircleMask from "./components/circleMask";
 import { reducer, initialState } from "./reducer";
@@ -63,6 +62,8 @@ function App() {
       localStorage.setItem("stepCount", JSON.stringify(stepCount));
     }
   }, [drawHistory, stepCount]);
+
+  const [filename, setFilename] = useState("dualpfp");
 
   // track last draw action then dispatch
   const trackedDispatch = (action: Action) => {
@@ -213,28 +214,127 @@ function App() {
         <canvas id="ui" className="layer" width={LENGTH}></canvas>
         <CircleMask isEnabled={showCircleMask} length={LENGTH} />
       </section>
-      <Toolbar
-        drawHistStep={state.stepCount}
-        maxDhStep={state.maxStepCount}
-        isEraser={isEraser}
-        brushSize={brushSize}
-        eraserSize={eraserSize}
-        isLight={isLight}
-        showCircleMask={showCircleMask}
-        showSecret={showSecret}
-        onSetEraser={handleSetEraser}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        onSetBrushSize={handleSetBrushSize}
-        onSetEraserSize={handleSetEraserSize}
-        onSetLight={handleSetLight}
-        onSetCircleMask={handleSetCircleMask}
-        onClearLight={handleClearLight}
-        onClearDark={handleClearDark}
-        onSaveImg={handleSaveImg}
-        onToggleSecret={handleToggleSecret}
-        onShowSecret={handleShowSecret}
-      />
+      <section className="tools">
+        <div id="undoStack">
+          <button
+            name="undo"
+            id="undo"
+            onClick={handleUndo}
+            disabled={stepCount <= 0}
+          >
+            undo
+          </button>
+          <button
+            name="redo"
+            id="redo"
+            onClick={handleRedo}
+            disabled={stepCount >= maxStepCount}
+          >
+            redo
+          </button>
+        </div>
+        <div id="toolSettings">
+          <div id="brushSettings">
+            <label htmlFor="brushSize">brush size</label>
+            <input
+              type="range"
+              min="1"
+              max="10"
+              id="brushSize"
+              name="brushSize"
+              value={brushSize}
+              onChange={(e) => handleSetBrushSize(Number(e.target.value))}
+            />
+            <label htmlFor="brushSize">{brushSize}</label>
+          </div>
+          <div id="eraserSettings">
+            <label htmlFor="eraserSize">eraser size</label>
+            <input
+              type="range"
+              min="1"
+              max="10"
+              id="eraserSize"
+              name="eraserSize"
+              value={eraserSize}
+              onChange={(e) => handleSetEraserSize(Number(e.target.value))}
+            />
+            <label htmlFor="brushSize">{eraserSize}</label>
+          </div>
+          <div>
+            <label htmlFor="isEraser">eraser?</label>
+            <input
+              type="checkbox"
+              name="isEraser"
+              id="isEraser"
+              checked={isEraser}
+              onChange={(e) => handleSetEraser(e.target.checked)}
+            />
+          </div>
+          <button
+            onClick={handleToggleSecret}
+            onPointerLeave={() => handleShowSecret(0, false)}
+            onPointerMove={(e) => {
+              const hue = Math.round(
+                (e.nativeEvent.offsetX / (e.target as HTMLElement).clientWidth) *
+                  255,
+              );
+              handleShowSecret(hue, true);
+            }}
+          >
+            {showSecret ? "regular bg" : "reveal secret"}
+          </button>
+        </div>
+        <div id="clearActions">
+          <button
+            name="clearLayerLight"
+            id="clearLayerLight"
+            onClick={handleClearLight}
+          >
+            clear light mode
+          </button>
+          <button
+            name="clearLayerDark"
+            id="clearLayerDark"
+            onClick={handleClearDark}
+          >
+            clear dark mode
+          </button>
+        </div>
+        <div id="displaySettings">
+          <div>
+            <label htmlFor="isLight">light mode?</label>
+            <input
+              type="checkbox"
+              name="isLight"
+              id="isLight"
+              checked={isLight}
+              onChange={(e) => handleSetLight(e.target.checked)}
+            />
+          </div>
+          <div>
+            <label htmlFor="showCircleMask">show circle mask?</label>
+            <input
+              type="checkbox"
+              name="showCircleMask"
+              id="showCircleMask"
+              checked={showCircleMask}
+              onChange={(e) => handleSetCircleMask(e.target.checked)}
+            />
+          </div>
+          <div id="saveField">
+            <input
+              type="text"
+              placeholder="pfp"
+              id="filenameField"
+              value={filename}
+              onChange={(e) => setFilename(e.target.value)}
+            />
+            <button id="saveButton" onClick={() => handleSaveImg(filename)}>
+              save image
+            </button>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
