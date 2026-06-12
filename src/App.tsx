@@ -20,6 +20,7 @@ import {
   UserCircle2,
   UserCircle2Icon,
   UserRound,
+  X,
 } from "lucide-react";
 
 const LENGTH = 80;
@@ -314,7 +315,7 @@ function App() {
             handleShowSecret(hue, true);
           }}
         >
-          {showSecret ? "regular bg" : "reveal secret"}
+          {showSecret ? "regular bg" : "...?"}
         </button>
       </section>
       <section id="clearBtns">
@@ -324,16 +325,20 @@ function App() {
             id="clearLayerLight"
             onClick={handleClearLight}
             style={{ display: isLight ? "block" : "none" }}
+            title="clear light mode"
           >
-            clear light mode
+            {/* clear light mode */}
+            <X />
           </button>
           <button
             name="clearLayerDark"
             id="clearLayerDark"
             onClick={handleClearDark}
             style={{ display: isLight ? "none" : "block" }}
+            title="clear dark mode"
           >
-            clear dark mode
+            {/* clear dark mode */}
+            <X />
           </button>
         </div>
       </section>

@@ -112,6 +112,7 @@
   }
 }
 
+/* todo add this to undo redo too?????*/
 .btnGroup {
   &.row {
     button:first-child {
@@ -127,6 +128,15 @@
       border-left: solid grey 2px;
     }
   }
+
+  button:is(:disabled) {
+    background-color: color-mix(in srgb, var(--btn-color) 50%, grey 50%);
+  }
+}
+
+#revealSecret {
+  background-color: #0000003f;
+  color: #ffffff3f;
 }
 button {
   border-radius: 8px;
@@ -143,10 +153,6 @@ button:not(:disabled) {
 button:not(:disabled):hover {
   background-color: color-mix(in srgb, var(--btn-color) 50%, white 50%);
 }
-button:not(:disabled):focus,
-button:focus-visible {
-}
-
 hr {
   width: 100%;
 }
