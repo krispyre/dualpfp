@@ -22,6 +22,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
+import { useHotkeys } from 'react-hotkeys-hook';
 
 const LENGTH = 80;
 const COL_DARK = "#313338";
@@ -198,6 +199,8 @@ function App() {
       });
     }
   };
+  useHotkeys('ctrl+z', handleUndo);
+  useHotkeys('ctrl+shift+z', handleRedo);
 
   return (
     <main id="gridWrap">
