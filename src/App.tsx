@@ -235,7 +235,9 @@ function App() {
     if (isLight) handleClearLight();
     else handleClearDark();
   });
-  useHotkeys("ctrl+s", () => handleSaveImg(filename));
+  useHotkeys("ctrl+s", (e,_) => {
+    e.preventDefault();
+    handleSaveImg(filename)});
   useHotkeys("tab", (e, _) => {
     e.preventDefault();
     if (isLight) handleSetLight(false);
