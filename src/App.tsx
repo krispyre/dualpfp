@@ -210,6 +210,11 @@ function App() {
     else handleClearDark();
   });
   useHotkeys("ctrl+s", () => handleSaveImg(filename));
+  useHotkeys("tab",(e,_)=>{
+    e.preventDefault();
+    if (isLight) handleSetLight(false);
+    else handleSetLight(true);
+  })
 
   return (
     <main id="gridWrap">
