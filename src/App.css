@@ -68,7 +68,7 @@
     #eraserToggle {
       grid-area: b;
     }
-    #revealSecret {
+    #viewAndSave {
       grid-area: o;
     }
   }
@@ -147,6 +147,12 @@
   }
 }
 
+#viewAndSave {
+  display: flex;
+  #revealSecret {
+    flex-grow: 1;
+  }
+}
 #revealSecret {
   background-color: #0000003f;
   color: #ffffff3f;

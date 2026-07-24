@@ -235,9 +235,10 @@ function App() {
     if (isLight) handleClearLight();
     else handleClearDark();
   });
-  useHotkeys("ctrl+s", (e,_) => {
+  useHotkeys("ctrl+s", (e, _) => {
     e.preventDefault();
-    handleSaveImg(filename)});
+    handleSaveImg(filename);
+  });
   useHotkeys("tab", (e, _) => {
     e.preventDefault();
     if (isLight) handleSetLight(false);
@@ -364,20 +365,29 @@ function App() {
             </button>
           </div>
         </div>
-        <button
-          id="revealSecret"
-          onClick={handleToggleSecret}
-          onPointerLeave={() => handleShowSecret(0, false)}
-          onPointerMove={(e) => {
-            const hue = Math.round(
-              (e.nativeEvent.offsetX / (e.target as HTMLElement).clientWidth) *
-                255,
-            );
-            handleShowSecret(hue, true);
-          }}
-        >
-          {showSecret ? "regular bg" : "...?"}
-        </button>
+        <section id="viewAndSave">
+          <button
+            id="revealSecret"
+            onClick={handleToggleSecret}
+            onPointerLeave={() => handleShowSecret(0, false)}
+            onPointerMove={(e) => {
+              const hue = Math.round(
+                (e.nativeEvent.offsetX / (e.target as HTMLElement).clientWidth) *
+                  255,
+              );
+              handleShowSecret(hue, true);
+            }}
+          >
+            {showSecret ? "regular bg" : "...?"}
+          </button>
+          <button
+            id="saveButton"
+            onClick={() => handleSaveImg(filename)}
+            title="save image"
+          >
+            <Save />
+          </button>
+        </section>
       </section>
       <section id="clearBtns">
         <div id="clearBtnsWrap">
@@ -432,13 +442,6 @@ function App() {
             value={filename}
             onChange={(e) => setFilename(e.target.value)}
           /> */}
-          <button
-            id="saveButton"
-            onClick={() => handleSaveImg(filename)}
-            title="save image"
-          >
-            <Save />
-          </button>
         </div>
       </section>
     </main>
