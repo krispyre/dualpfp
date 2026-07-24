@@ -6,6 +6,12 @@
 
   height: 100vh;
   overflow: hidden;
+
+  * {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax (Chrome, Edge, Firefox, Opera) */
+  }
 }
 .debug * {
   outline: 1px solid rgba(35, 255, 1, 0.551);
@@ -38,7 +44,7 @@
   }
   #clearBtns {
     grid-area: a;
-    place-self: end end
+    place-self: end end;
   }
   #undoStack {
     grid-area: b;
