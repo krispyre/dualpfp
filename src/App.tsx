@@ -171,8 +171,12 @@ function App() {
       return !pixelView.some((color) => color !== 0);
     }
 
-    if (isCanvasBlank(layerDarkCanvas) && isCanvasBlank(layerLightCanvas)){
-      alert("Canvas blank")
+    if (
+      isCanvasBlank(layerDarkCanvas.current) &&
+      isCanvasBlank(layerLightCanvas.current)
+    ) {
+      alert("Canvas blank");
+      return;
     }
 
     const exportCanvas = document.createElement("canvas");
