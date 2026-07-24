@@ -28,6 +28,8 @@ import gsap from "gsap";
 const LENGTH = 80;
 const COL_DARK = "#313338";
 const COL_LIGHT = "#FFFFFF";
+const COL_FLASH_LIGHT = "#e3a3b2";
+const COL_FLASH_DARK = "#824458";
 
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -177,7 +179,7 @@ function App() {
       isCanvasBlank(layerDarkCanvas.current) &&
       isCanvasBlank(layerLightCanvas.current)
     ) {
-      const flashCol = isLight ? "#e3a3b2" : "#824458";
+      const flashCol = isLight ? COL_FLASH_DARK : COL_FLASH_LIGHT;
       gsap
         .timeline()
         .to(containerRef.current!, {
