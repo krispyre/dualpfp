@@ -231,36 +231,38 @@ function App() {
 
   return (
     <main id="gridWrap">
-      <section
-        id="canvasContainer"
-        style={{
-          backgroundColor: bgCol,
-        }}
-      >
-        <Layer
-          ref={layerDarkRef}
-          drawHistory={drawHistory}
-          canvasRef={layerDarkCanvas}
-          isLight={false}
-          length={LENGTH}
-          isEnabled={!isLight}
-          brushSize={isEraser ? eraserSize : brushSize}
-          isErase={isEraser}
-          addDrawHist={addDrawHist}
-        />
-        <Layer
-          ref={layerLightRef}
-          drawHistory={drawHistory}
-          canvasRef={layerLightCanvas}
-          isLight={true}
-          length={LENGTH}
-          isEnabled={isLight}
-          brushSize={isEraser ? eraserSize : brushSize}
-          isErase={isEraser}
-          addDrawHist={addDrawHist}
-        />
-        <canvas id="ui" className="layer" width={LENGTH}></canvas>
-        <CircleMask isEnabled={showCircleMask} length={LENGTH} />
+      <section id="canvasCell">
+        <section
+          id="canvasContainer"
+          style={{
+            backgroundColor: bgCol,
+          }}
+        >
+          <Layer
+            ref={layerDarkRef}
+            drawHistory={drawHistory}
+            canvasRef={layerDarkCanvas}
+            isLight={false}
+            length={LENGTH}
+            isEnabled={!isLight}
+            brushSize={isEraser ? eraserSize : brushSize}
+            isErase={isEraser}
+            addDrawHist={addDrawHist}
+          />
+          <Layer
+            ref={layerLightRef}
+            drawHistory={drawHistory}
+            canvasRef={layerLightCanvas}
+            isLight={true}
+            length={LENGTH}
+            isEnabled={isLight}
+            brushSize={isEraser ? eraserSize : brushSize}
+            isErase={isEraser}
+            addDrawHist={addDrawHist}
+          />
+          <canvas id="ui" className="layer" width={LENGTH}></canvas>
+          <CircleMask isEnabled={showCircleMask} length={LENGTH} />
+        </section>
       </section>
       <section id="undoStack">
         <div id="undosWrap" className="btnGroup col">

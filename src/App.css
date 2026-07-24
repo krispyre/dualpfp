@@ -3,7 +3,7 @@
   background-color: #242424;
   --btn-color: #0000007a;
   --accent-color: #7024ff;
-  
+
   height: 100vh;
   overflow: hidden;
 }
@@ -11,7 +11,7 @@
   outline: 1px solid rgba(35, 255, 1, 0.551);
 }
 #root {
-   height: 100vh;
+  height: 100vh;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -25,6 +25,9 @@
   margin: auto;
   display: grid;
   gap: 1em;
+
+  grid-template-columns: 1fr max-content 1fr;
+  grid-template-rows: 1fr max-content 1fr;
   grid-template-areas:
     ". a ."
     "b c d"
@@ -35,12 +38,14 @@
   }
   #clearBtns {
     grid-area: a;
+    place-self: end end
   }
   #undoStack {
     grid-area: b;
   }
-  #canvasContainer {
+  #canvasCell {
     grid-area: c;
+    place-items: center;
   }
   #displayToggles {
     grid-area: d;
