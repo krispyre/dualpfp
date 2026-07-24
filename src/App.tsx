@@ -210,11 +210,24 @@ function App() {
     else handleClearDark();
   });
   useHotkeys("ctrl+s", () => handleSaveImg(filename));
-  useHotkeys("tab",(e,_)=>{
+  useHotkeys("tab", (e, _) => {
     e.preventDefault();
     if (isLight) handleSetLight(false);
     else handleSetLight(true);
-  })
+  });
+  //disable scroll to zoom
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        console.warn("zooming disabled bc the canvas breaks, sorry");
+      }
+    };
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
 
   return (
     <main id="gridWrap">
