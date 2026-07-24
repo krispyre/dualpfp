@@ -201,6 +201,10 @@ function App() {
   };
   useHotkeys('ctrl+z', handleUndo);
   useHotkeys('ctrl+shift+z', handleRedo);
+  useHotkeys('e', ()=>handleSetEraser(true));// todo turn to toggle
+  useHotkeys('b', ()=>handleSetEraser(false))
+  
+
 
   return (
     <main id="gridWrap">
