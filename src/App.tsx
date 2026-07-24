@@ -23,6 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { useHotkeys } from "react-hotkeys-hook";
+import gsap from "gsap";
 
 const LENGTH = 80;
 const COL_DARK = "#313338";
@@ -92,6 +93,7 @@ function App() {
   const layerLightCanvas = useRef<HTMLCanvasElement>(null);
   const layerDarkRef = useRef<LayerHandle>(null);
   const layerLightRef = useRef<LayerHandle>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const addDrawHist = (isLight: boolean, newPath: Point[]) => {
     trackedDispatch({
@@ -175,7 +177,10 @@ function App() {
       isCanvasBlank(layerDarkCanvas.current) &&
       isCanvasBlank(layerLightCanvas.current)
     ) {
-      alert("Canvas blank");
+      const flashCol = isLight ? "#824458" : "#e3a3b2";
+      gsap.timeline()
+        .to(containerRef.current!, { backgroundColor: flashCol, duration: 0.15 })
+        .to(containerRef.current!, { backgroundColor: bgCol, duration: 0.3 });
       return;
     }
 
@@ -249,6 +254,7 @@ function App() {
       <section id="canvasCell">
         <section
           id="canvasContainer"
+          ref={containerRef}
           style={{
             backgroundColor: bgCol,
           }}
