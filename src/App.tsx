@@ -177,10 +177,14 @@ function App() {
       isCanvasBlank(layerDarkCanvas.current) &&
       isCanvasBlank(layerLightCanvas.current)
     ) {
-      const flashCol = isLight ? "#824458" : "#e3a3b2";
-      gsap.timeline()
-        .to(containerRef.current!, { backgroundColor: flashCol, duration: 0.15 })
-        .to(containerRef.current!, { backgroundColor: bgCol, duration: 0.3 });
+      const flashCol = isLight ? "#e3a3b2" : "#824458";
+      gsap
+        .timeline()
+        .to(containerRef.current!, {
+          backgroundColor: flashCol,
+          duration: 0.0,
+        })
+        .to(containerRef.current!, { backgroundColor: bgCol, duration: 0.2 });
       return;
     }
 
