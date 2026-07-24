@@ -209,6 +209,7 @@ function App() {
     if (isLight) handleClearLight();
     else handleClearDark();
   });
+  useHotkeys("ctrl+s", () => handleSaveImg(filename));
 
   return (
     <main id="gridWrap">
