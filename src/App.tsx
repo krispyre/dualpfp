@@ -22,6 +22,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
+import { useHotkeys } from "react-hotkeys-hook";
 
 const LENGTH = 80;
 const COL_DARK = "#313338";
@@ -198,6 +199,35 @@ function App() {
       });
     }
   };
+  useHotkeys("ctrl+z", handleUndo);
+  useHotkeys("ctrl+shift+z", handleRedo);
+  useHotkeys("e", () => {
+    handleSetEraser(!isEraser);
+  }); // todo turn to toggle
+  useHotkeys("b", () => handleSetEraser(false));
+  useHotkeys("delete", () => {
+    if (isLight) handleClearLight();
+    else handleClearDark();
+  });
+  useHotkeys("ctrl+s", () => handleSaveImg(filename));
+  useHotkeys("tab", (e, _) => {
+    e.preventDefault();
+    if (isLight) handleSetLight(false);
+    else handleSetLight(true);
+  });
+  //disable scroll to zoom
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        console.warn("zooming disabled bc the canvas breaks, sorry");
+      }
+    };
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
 
   return (
     <main id="gridWrap">
