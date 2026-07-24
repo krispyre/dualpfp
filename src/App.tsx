@@ -203,6 +203,10 @@ function App() {
   useHotkeys('ctrl+shift+z', handleRedo);
   useHotkeys('e', ()=>handleSetEraser(true));// todo turn to toggle
   useHotkeys('b', ()=>handleSetEraser(false))
+  useHotkeys('delete', ()=>{
+    if (isLight) handleClearLight();
+    else handleClearDark();
+  })
   
 
 
