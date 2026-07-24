@@ -164,6 +164,17 @@ function App() {
     const dark: HTMLCanvasElement = layerDarkCanvas.current!;
     const light: HTMLCanvasElement = layerLightCanvas.current!;
 
+    function isCanvasBlank(canvas) {
+      const ctx = canvas.getContext("2d");
+      const buffer = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      const pixelView = new Uint32Array(buffer.buffer);
+      return !pixelView.some((color) => color !== 0);
+    }
+
+    if (isCanvasBlank(layerDarkCanvas) && isCanvasBlank(layerLightCanvas)){
+      alert("Canvas blank")
+    }
+
     const exportCanvas = document.createElement("canvas");
     exportCanvas.width = LENGTH;
     exportCanvas.height = LENGTH;
